@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+*.egg-info/
+
+# Databases + trained artifacts
+*.db
+models_saved/*.pkl
+models_saved/*.pt
+models_saved/*.json
+
+# Frontend
+frontend/node_modules
+frontend/.next
+frontend/out
+
+# Environments / editor
+.env
+.env.local
+.vscode/
+.idea/

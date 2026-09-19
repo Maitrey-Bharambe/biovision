@@ -1,0 +1,180 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root { color-scheme: light only; }
+
+/* Force our design in Firefox / OS high-contrast (forced-colors) mode so the
+ * dashboard doesn't collapse to plain black-and-white. */
+html, body, .card, .card-solid, .pill, .badge, .btn, .btn-ghost,
+select, input, textarea,
+[class*="bg-"], [class*="text-"], [class*="border-"],
+svg, svg * {
+  forced-color-adjust: none !important;
+}
+
+html {
+  background: #e5f5f7;
+}
+body {
+  background: transparent !important;
+  color: #0a2540;
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  min-height: 100vh;
+  position: relative;
+}
+
+/* Full-viewport biotech backdrop: DNA helix + protein + cells + molecules.
+ * A very light frost sits on top for legibility (25%) — the image itself
+ * carries the palette so the site inherits its aqua feel naturally.       */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(229,245,247,0.20), rgba(229,245,247,0.28)),
+    url('/hero-bg.png');
+  background-size: cover, cover;
+  background-position: center, center;
+  background-attachment: fixed, fixed;
+  background-repeat: no-repeat, no-repeat;
+}
+
+.font-display { font-family: 'Space Grotesk', system-ui, sans-serif; letter-spacing: -0.02em; }
+
+/* --- Card system ------------------------------------------------------ */
+.card {
+  background: rgba(255,255,255,0.72);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,0.9);
+  border-radius: 1.75rem;
+  padding: 1.25rem 1.5rem;
+  box-shadow: 0 10px 32px -12px rgba(10,37,64,0.18), 0 2px 6px rgba(10,37,64,0.04);
+}
+
+.card-solid {
+  background: #d0ecf1;
+  border-radius: 2rem;
+  padding: 1.25rem 1.5rem;
+}
+
+.card-heading {
+  font-size: 0.7rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #5b7594;
+  font-weight: 500;
+}
+
+.pill {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.3rem 0.75rem;
+  border-radius: 999px;
+  background: rgba(14,165,183,0.10);
+  color: #0a2540;
+  border: 1px solid rgba(14,165,183,0.25);
+  font-size: 0.72rem; font-weight: 500;
+}
+
+.badge {
+  display: inline-flex; align-items: center; gap: 0.35rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  background: rgba(10,37,64,0.06);
+  color: #0a2540;
+  border: 1px solid rgba(10,37,64,0.08);
+}
+
+/* --- Button ----------------------------------------------------------- */
+.btn {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 0.7rem 1.2rem; border-radius: 999px;
+  background: #0a2540; color: #ffffff;
+  font-size: 0.85rem; font-weight: 500;
+  border: 1px solid #0a2540;
+  cursor: pointer; transition: all 0.15s ease;
+}
+.btn:hover { background: #123057; transform: translateY(-1px); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+.btn-ghost {
+  background: rgba(255,255,255,0.6);
+  color: #0a2540;
+  border: 1px solid rgba(10,37,64,0.15);
+}
+.btn-ghost:hover { background: white; }
+
+/* --- Metric ----------------------------------------------------------- */
+.metric-value {
+  font-variant-numeric: tabular-nums;
+  font-family: 'Space Grotesk', ui-monospace, monospace;
+  color: #0a2540;
+  font-weight: 600;
+}
+
+/* --- DNA nucleotide colouring --------------------------------------- */
+.dna { font-family: ui-monospace, monospace; letter-spacing: 0.08em; }
+.nuc-A { color: #2f6df1; font-weight: 600; }
+.nuc-C { color: #e0526d; font-weight: 600; }
+.nuc-G { color: #1fb885; font-weight: 600; }
+.nuc-T { color: #e0a021; font-weight: 600; }
+
+/* --- Tables ---------------------------------------------------------- */
+table.data { width: 100%; border-collapse: collapse; font-size: 0.85rem; color: #0a2540; }
+table.data th, table.data td { padding: 0.55rem 0.75rem; text-align: left; border-bottom: 1px solid rgba(10,37,64,0.08); }
+table.data th { color: #5b7594; font-weight: 500; text-transform: uppercase; letter-spacing: 0.09em; font-size: 0.68rem; }
+table.data tr:hover td { background: rgba(77,208,225,0.06); }
+
+/* --- Scrollbox ------------------------------------------------------- */
+.scrollbox { max-height: 26rem; overflow: auto; padding-right: 0.25rem; }
+.scrollbox::-webkit-scrollbar { width: 6px; height: 6px; }
+.scrollbox::-webkit-scrollbar-thumb { background: #b8dfe6; border-radius: 3px; }
+
+/* Selects / inputs ---------------------------------------------------- */
+select, input, textarea {
+  background: rgba(255,255,255,0.85) !important;
+  color: #0a2540 !important;
+  border: 1px solid rgba(10,37,64,0.15) !important;
+  border-radius: 0.75rem !important;
+}
+select:focus, input:focus, textarea:focus {
+  outline: none !important;
+  border-color: #0ea5b7 !important;
+  box-shadow: 0 0 0 3px rgba(14,165,183,0.15) !important;
+}
+
+/* --- Ghost display text ---------------------------------------------- */
+.ghost-text {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: rgba(10,37,64,0.08);
+  line-height: 0.9;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* --- Cell orb animation --------------------------------------------- */
+@keyframes float-slow  { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-14px) } }
+@keyframes float-slow2 { 0%,100% { transform: translateY(0) } 50% { transform: translateY(18px) } }
+@keyframes pulse-soft  { 0%,100% { opacity: 0.9 } 50% { opacity: 0.55 } }
+@keyframes spin-slow   { from { transform: rotate(0) } to { transform: rotate(360deg) } }
+
+.float-slow  { animation: float-slow  6s ease-in-out infinite; }
+.float-slow2 { animation: float-slow2 8s ease-in-out infinite; }
+.pulse-soft  { animation: pulse-soft  4s ease-in-out infinite; }
+.spin-slow   { animation: spin-slow  40s linear    infinite; transform-origin: center; }
+
+/* --- Recharts overrides (light theme) ------------------------------- */
+.recharts-cartesian-axis-tick text { fill: #5b7594 !important; }
+.recharts-legend-item-text        { color: #0a2540 !important; }

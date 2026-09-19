@@ -1,0 +1,22 @@
+# Loose lower bounds so pip picks a prebuilt wheel that matches your Python
+# version (works on 3.10 – 3.13 on Windows without a compiler toolchain).
+
+fastapi>=0.115
+uvicorn[standard]>=0.30
+SQLAlchemy>=2.0
+pydantic>=2.9
+
+pandas>=2.2.3
+numpy>=1.26
+scikit-learn>=1.5
+mlxtend>=0.23
+
+Pillow>=10.4
+opencv-python-headless>=4.10
+
+# torch wheels are Python-version-sensitive; loose lower bound + Python 3.10–3.13
+torch>=2.4
+torchvision>=0.19
+
+python-multipart>=0.0.9
+joblib>=1.4
