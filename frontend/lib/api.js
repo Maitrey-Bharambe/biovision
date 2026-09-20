@@ -61,6 +61,15 @@ export const api = {
   olapCvBins:      ()                             => req('/olap/cv/confidence-bins'),
   olapCvErrors:    ()                             => req('/olap/cv/errors'),
 
+  // OLAP · 3-D cube
+  cube:            (params = {}) => {
+    const qs = Object.entries(params)
+      .filter(([_, v]) => v !== undefined && v !== null && v !== '')
+      .map(([k, v]) => `${k}=${encodeURIComponent(v)}`).join('&');
+    return req('/olap/cube' + (qs ? `?${qs}` : ''));
+  },
+  cubeDimensions:  ()                             => req('/olap/cube/dimensions'),
+
   warehouseSchema: ()                             => req('/warehouse/schema'),
   runEtl:          ()                             => req('/etl/run', { method: 'POST' }),
 

@@ -8,6 +8,7 @@ from backend.database.db import engine, Base
 from backend.api.routers import (
     overview, genome, rna, protein, mutation, samples, images, ml_router,
     olap, warehouse, etl_router, cv_router, alpha_router, olap_domains,
+    olap_cube,
 )
 
 app = FastAPI(
@@ -41,6 +42,7 @@ app.include_router(ml_router.router,  prefix="/analytics",      tags=["ML / Mini
 app.include_router(cv_router.router,  prefix="/cv",             tags=["Computer Vision"])
 app.include_router(olap.router,       prefix="/olap",           tags=["OLAP"])
 app.include_router(olap_domains.router, prefix="/olap",         tags=["OLAP Cross-Domain"])
+app.include_router(olap_cube.router,    prefix="/olap",         tags=["OLAP 3D Cube"])
 app.include_router(warehouse.router,  prefix="/warehouse",      tags=["Warehouse"])
 app.include_router(etl_router.router, prefix="/etl",            tags=["ETL"])
 app.include_router(alpha_router.router, prefix="/alpha",        tags=["AlphaGenome Lab"])

@@ -178,3 +178,180 @@ select:focus, input:focus, textarea:focus {
 /* --- Recharts overrides (light theme) ------------------------------- */
 .recharts-cartesian-axis-tick text { fill: #5b7594 !important; }
 .recharts-legend-item-text        { color: #0a2540 !important; }
+
+/* =====================================================================
+ *  OLAP Cube — light theme, matches the rest of the BioVision site.
+ *  Scoped to .cube-root so it can't leak into other pages.
+ * ==================================================================== */
+.cube-root {
+  --cube-fg:     #0a2540;
+  --cube-muted:  #5b7594;
+  --cube-accent: #0ea5b7;
+  --cube-good:   #0ea5b7;
+  --cube-warn:   #e56b8f;
+  --cube-border: rgba(184,223,230,0.7);
+
+  color: var(--cube-fg);
+  border-radius: 28px;
+  padding: 18px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.72), rgba(234,248,251,0.55));
+  border: 1px solid rgba(255,255,255,0.9);
+  box-shadow: 0 10px 32px -12px rgba(10,37,64,0.18), 0 2px 6px rgba(10,37,64,0.04);
+  backdrop-filter: blur(16px);
+}
+.cube-root .text-cube-fg     { color: var(--cube-fg); }
+.cube-root .text-cube-muted  { color: var(--cube-muted); }
+.cube-root .text-cube-accent { color: var(--cube-accent); }
+
+.cube-panel {
+  background: rgba(255,255,255,0.85);
+  border: 1px solid var(--cube-border);
+  border-radius: 20px;
+  padding: 14px 16px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 6px 18px -12px rgba(10,37,64,0.15);
+}
+.cube-panel-heading {
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--cube-muted);
+  margin-bottom: 10px;
+}
+
+.cube-op-button {
+  width: 100%;
+  text-align: left;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(184,223,230,0.7);
+  background: rgba(255,255,255,0.72);
+  color: var(--cube-fg);
+  display: flex; flex-direction: column;
+  transition: all .15s ease;
+}
+.cube-op-button:hover  { background: rgba(14,165,183,0.10); border-color: rgba(14,165,183,0.55); }
+.cube-op-button.active { background: linear-gradient(135deg, rgba(14,165,183,0.16), rgba(77,208,225,0.18));
+                          border-color: var(--cube-accent); }
+.cube-op-label { font-weight: 600; }
+.cube-op-hint  { font-size: 10px; color: var(--cube-muted); }
+
+.cube-btn-primary {
+  padding: 8px 14px; border-radius: 999px;
+  background: #0a2540;
+  color: white; font-weight: 600; font-size: 12px;
+  border: 1px solid #0a2540;
+}
+.cube-btn-primary:hover { background: #123057; transform: translateY(-1px); }
+.cube-btn-ghost {
+  padding: 8px 14px; border-radius: 999px;
+  background: rgba(255,255,255,0.75);
+  border: 1px solid rgba(10,37,64,0.15);
+  color: var(--cube-fg); font-size: 12px;
+}
+.cube-btn-ghost:hover { background: rgba(14,165,183,0.10); }
+
+.cube-divider { height: 1px; background: rgba(184,223,230,0.7); }
+
+.cube-badge {
+  font-size: 10px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(14,165,183,0.30);
+  background: rgba(14,165,183,0.10);
+  color: var(--cube-fg);
+}
+
+.cube-controls { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+.cube-picker { display: flex; flex-direction: column; font-size: 11px; color: var(--cube-muted); }
+.cube-picker > span { text-transform: uppercase; letter-spacing: 0.16em; margin-bottom: 4px; }
+.cube-picker select {
+  background: rgba(255,255,255,0.90) !important;
+  color: var(--cube-fg) !important;
+  border: 1px solid rgba(10,37,64,0.15) !important;
+  border-radius: 12px !important;
+  padding: 7px 10px !important;
+  font-size: 13px !important;
+  min-width: 140px;
+}
+
+.cube-query-state {
+  margin-top: 12px;
+  border-radius: 20px;
+  border: 1px solid var(--cube-border);
+  background: rgba(255,255,255,0.85);
+  padding: 14px 18px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 6px 18px -12px rgba(10,37,64,0.15);
+}
+
+.cube-sql {
+  background: #0a2540;
+  border: 1px solid rgba(56,189,248,0.25);
+  border-radius: 12px;
+  padding: 12px;
+  color: #a5f3fc;
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  font-size: 11px;
+  white-space: pre-wrap;
+  overflow-x: auto;
+}
+
+.cube-modal {
+  position: absolute; top: 14px; left: 14px; right: 14px;
+  z-index: 30;
+  background: rgba(255,255,255,0.95);
+  border: 1px solid rgba(14,165,183,0.30);
+  border-radius: 22px;
+  padding: 16px;
+  backdrop-filter: blur(14px);
+  box-shadow: 0 30px 80px -20px rgba(10,37,64,0.25);
+}
+.cube-modal-head {
+  display:flex; align-items: center; justify-content: space-between;
+  margin-bottom: 10px;
+}
+.cube-filter-list {
+  display: flex; flex-direction: column; gap: 4px;
+  max-height: 210px; overflow-y: auto;
+  padding-right: 4px;
+}
+.cube-filter-chip {
+  display: flex; align-items: center; gap: 8px;
+  padding: 5px 10px; border-radius: 10px;
+  border: 1px solid rgba(184,223,230,0.7);
+  background: rgba(255,255,255,0.75);
+  color: var(--cube-fg);
+  font-size: 12px; text-align: left;
+}
+.cube-filter-chip .dot {
+  width: 8px; height: 8px; border-radius: 999px;
+  background: transparent; border: 1px solid var(--cube-muted);
+}
+.cube-filter-chip.on {
+  background: rgba(14,165,183,0.16);
+  border-color: var(--cube-accent);
+}
+.cube-filter-chip.on .dot { background: var(--cube-accent); border-color: var(--cube-accent); }
+
+.cube-table {
+  width: 100%; border-collapse: collapse; font-size: 12px; color: var(--cube-fg);
+}
+.cube-table th, .cube-table td {
+  padding: 6px 10px; border-bottom: 1px solid rgba(184,223,230,0.7); text-align: left;
+}
+.cube-table th {
+  color: var(--cube-muted); text-transform: uppercase; letter-spacing: 0.1em;
+  font-size: 10px; font-weight: 500;
+}
+.cube-table tbody tr:hover td { background: rgba(14,165,183,0.06); }
+
+/* Canvas wrapper — subtle deep-aqua background so voxels still pop while
+   staying within the site palette. */
+.cube-canvas-wrap {
+  border-radius: 22px;
+  overflow: hidden;
+  border: 1px solid rgba(14,165,183,0.30);
+  background: radial-gradient(circle at 30% 30%, #cfeef4 0%, #9bd6e0 40%, #10425a 100%);
+  box-shadow: inset 0 0 60px rgba(10,37,64,0.25);
+}
