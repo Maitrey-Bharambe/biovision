@@ -1,10 +1,15 @@
 'use client';
 import { useEffect, useMemo, useState } from 'react';
+import dynamic from 'next/dynamic';
 import { api } from '../../lib/api';
 import { PageHeader } from '../../components/PageHeader';
 import { Card } from '../../components/Card';
 import { Gauge } from '../../components/viz/Gauge';
-import { Dna3D } from '../../components/viz/Dna3D';
+// 3D helix uses react-three-fiber → load client-side only.
+const Dna3DHelix = dynamic(
+  () => import('../../components/viz/Dna3DHelix').then(m => m.Dna3DHelix),
+  { ssr: false, loading: () => <div className="text-muted text-sm p-6">Loading 3-D helix…</div> }
+);
 
 const TABS = [
   { id: 'editor',  label: 'Live DNA Editor',       icon: '⌬' },
@@ -137,23 +142,28 @@ function DnaEditor() {
           </div>
         </Card>
 
-        <Card className="col-span-12 lg:col-span-4" title="Double-helix — live"
-              subtitle="rotating 3-D preview · selected position glows">
-          <div className="flex justify-center">
-            <Dna3D
-              sequence={ref?.reference_dna?.slice(pos, pos + 20) || 'ATGCGTAGCTAGCTAGCGTA'}
-              highlight={0}
-              width={200} height={340} />
-          </div>
-        </Card>
-
-        <Card className="col-span-12 lg:col-span-4" title="2 · Sequence view"
-              subtitle="tap a base to select its position">
-          <NucleotideStrip dna={ref?.reference_dna || ''}
-                            selectedPos={pos}
-                            onSelect={setPos}/>
+        <Card className="col-span-12 lg:col-span-8"
+              title="Live 3-D double helix"
+              subtitle="Rotating double helix with sugar-phosphate backbones, hydrogen-bond rungs and colour-coded nucleotides. Drag to orbit · scroll to zoom · click any bead to select that position. The ring glows pink at your edit site; the alt base floats next to it in its native colour."
+              actions={<span className="pill">Three.js · live</span>}>
+          <Dna3DHelix
+            sequence={ref?.reference_dna || 'ATGCGTAGCTAGCTAGCGTA'}
+            highlight={pos}
+            altBase={alt}
+            onPick={(p) => setPos(p)}
+            height={420}
+            showProtein
+          />
         </Card>
       </div>
+
+      <Card title="2 · Full reference sequence"
+            subtitle="Tap any base to jump the 3-D view to that position. Highlighted base is the current edit site."
+            className="mb-5">
+        <NucleotideStrip dna={ref?.reference_dna || ''}
+                         selectedPos={pos}
+                         onSelect={setPos}/>
+      </Card>
 
       {report && (
         <>
