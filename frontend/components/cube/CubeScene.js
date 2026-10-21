@@ -33,9 +33,9 @@ export function CubeScene({
       camera={{ position: [8.5, 6.5, 9], fov: 38 }}
       style={{ background: 'transparent' }}>
       {/* very soft ambient palette — no fog so cells stay visible on the light backdrop */}
-      <ambientLight intensity={0.9}/>
+      <ambientLight intensity={0.95}/>
       <pointLight position={[6, 8, 6]}  intensity={0.55} color="#ffffff"/>
-      <pointLight position={[-5, 4, -5]} intensity={0.35} color="#7fe3d4"/>
+      <pointLight position={[-5, 4, -5]} intensity={0.30} color="#F9F9F7"/>
 
       <PivotGroup pivotKey={pivotKey}>
         {/* Center the cube around origin */}
@@ -92,7 +92,7 @@ function PivotGroup({ pivotKey, children }) {
 /*  GRID PLANES                                                           */
 /* -------------------------------------------------------------------- */
 function Grid({ nx, ny, nz, step }) {
-  const c = "#1e5670";
+  const c = "#111111";
   const lines = [];
   for (let i = 0; i <= nx; i++)
     lines.push([[i * step.x, 0, 0], [i * step.x, ny * step.y, 0]]);
@@ -120,21 +120,20 @@ function Grid({ nx, ny, nz, step }) {
 /*  AXIS LABELS + TICK MARKS                                              */
 /* -------------------------------------------------------------------- */
 function AxisLabels({ axes, nx, ny, nz, step, SIZE }) {
-  const titleColor = "#eaffff";
-  const tickColor  = "#eaffff";
+  const tickColor  = "#111111";
 
   const truncate = (s, n) => (String(s).length > n ? String(s).slice(0, n-1) + '…' : String(s));
 
   return (
     <group>
-      {/* Axis titles */}
-      <Text position={[nx*step.x/2, -0.55, nz*step.z + 0.15]} fontSize={0.28} color="#7fe3d4"
+      {/* Axis titles — ink, uppercase, newsprint-style */}
+      <Text position={[nx*step.x/2, -0.55, nz*step.z + 0.15]} fontSize={0.28} color="#111111"
             anchorX="center">{axes.x.label.toUpperCase()}</Text>
-      <Text position={[-0.7, ny*step.y/2, nz*step.z + 0.15]} fontSize={0.28} color="#a5f3fc"
+      <Text position={[-0.7, ny*step.y/2, nz*step.z + 0.15]} fontSize={0.28} color="#111111"
             rotation={[0, 0, Math.PI / 2]} anchorX="center">
         {axes.y.label.toUpperCase()}
       </Text>
-      <Text position={[nx*step.x + 0.25, -0.55, nz*step.z/2]} fontSize={0.28} color="#f9a8d4"
+      <Text position={[nx*step.x + 0.25, -0.55, nz*step.z/2]} fontSize={0.28} color="#CC0000"
             rotation={[0, -Math.PI / 2, 0]} anchorX="center">
         {axes.z.label.toUpperCase()}
       </Text>
@@ -182,7 +181,7 @@ function tickIndices(n, maxTicks = 10) {
 /* -------------------------------------------------------------------- */
 function CubeFrame({ nx, ny, nz, step }) {
   const X = nx * step.x, Y = ny * step.y, Z = nz * step.z;
-  const c = "#22d3ee";
+  const c = "#111111";
   const corners = [
     [[0,0,0],[X,0,0]], [[0,Y,0],[X,Y,0]],
     [[0,0,Z],[X,0,Z]], [[0,Y,Z],[X,Y,Z]],
@@ -221,9 +220,9 @@ function SlicePlane({ slice, nx, ny, nz, step }) {
   return (
     <mesh position={position} rotation={rotation}>
       <planeGeometry args={args}/>
-      <meshStandardMaterial color="#f472b6" transparent opacity={0.22}
+      <meshStandardMaterial color="#CC0000" transparent opacity={0.18}
                             side={THREE.DoubleSide}
-                            emissive="#ec4899" emissiveIntensity={0.6}/>
+                            emissive="#CC0000" emissiveIntensity={0.35}/>
     </mesh>
   );
 }
@@ -312,12 +311,14 @@ function CellMesh({ cell, step, onHover, onSelect, isSelected }) {
 }
 
 function colorForT(t) {
-  // teal → aqua → violet → rose gradient, vibrant on light backdrop
+  // Newsprint gradient: paper → gray → ink, with a red terminus for high
+  // values.  Keeps the cube monochrome at low metrics and reserves red for
+  // the top of the scale, matching the editorial palette.
   const stops = [
-    [0.00, [14, 165, 183]],   // #0ea5b7 teal
-    [0.35, [77, 208, 225]],   // aqua
-    [0.65, [167, 139, 250]],  // violet
-    [1.00, [244, 114, 182]],  // rose
+    [0.00, [245, 245, 245]],   // paper
+    [0.40, [180, 180, 180]],   // gray
+    [0.75, [ 70,  70,  70]],   // deep gray
+    [1.00, [204,   0,   0]],   // accent red
   ];
   let a = stops[0], b = stops[stops.length - 1];
   for (let i = 0; i < stops.length - 1; i++) {

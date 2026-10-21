@@ -10,15 +10,19 @@ export function ConfusionMatrix({ matrix = [[0,0],[0,0]], labels = ['Class A','C
   const total = matrix.flat().reduce((a,b)=>a+b, 0) || 1;
   const cell = Math.floor(size / N);
 
-  const color = (v) => {
+  const color = (v, isDiag) => {
     const t = v / max;
-    // gradient from #eaf8fb (light) to #0a2540 (deep navy)
-    const rgb = [
-      Math.round(234 - t * (234 - 10)),
-      Math.round(248 - t * (248 - 37)),
-      Math.round(251 - t * (251 - 64)),
-    ];
-    return `rgb(${rgb[0]},${rgb[1]},${rgb[2]})`;
+    // Diagonal uses ink; off-diagonal uses accent red for errors.  Both
+    // interpolate from paper → full strength, so correct cells stay dark and
+    // confused cells show up red.
+    if (isDiag) {
+      const g = Math.round(249 - t * (249 - 17));
+      return `rgb(${g},${g},${g})`;
+    }
+    const r = Math.round(249 - t * (249 - 204));
+    const g = Math.round(249 - t * 249);
+    const b = Math.round(247 - t * 247);
+    return `rgb(${r},${g},${b})`;
   };
 
   return (
@@ -26,34 +30,35 @@ export function ConfusionMatrix({ matrix = [[0,0],[0,0]], labels = ['Class A','C
       <div className="flex">
         <div style={{ width: 90 }} />
         {labels.map((l, j) => (
-          <div key={j} style={{ width: cell }} className="text-center text-[11px] text-muted font-medium truncate">
+          <div key={j} style={{ width: cell }} className="text-center meta !text-[10px] truncate">
             {l}
           </div>
         ))}
       </div>
       {matrix.map((row, i) => (
         <div key={i} className="flex items-center">
-          <div style={{ width: 90 }} className="text-right pr-2 text-[11px] text-muted font-medium truncate">
+          <div style={{ width: 90 }} className="text-right pr-2 meta !text-[10px] truncate">
             {labels[i]}
           </div>
           {row.map((v, j) => {
-            const bg = color(v);
+            const isDiag = i === j;
+            const bg = color(v, isDiag);
             const t = v / max;
-            const fg = t > 0.5 ? '#ffffff' : '#0a2540';
+            const fg = t > 0.5 ? '#FFFFFF' : '#111111';
             return (
               <div key={j}
-                   className="flex items-center justify-center border border-white"
+                   className="flex items-center justify-center border border-ink"
                    style={{ width: cell, height: cell, background: bg, color: fg }}>
                 <div className="text-center">
-                  <div className="font-display font-bold text-xl leading-none">{v}</div>
-                  <div className="text-[10px] opacity-70 mt-0.5">{((v/total)*100).toFixed(0)}%</div>
+                  <div className="font-mono font-bold text-xl leading-none">{v}</div>
+                  <div className="text-[10px] opacity-70 mt-0.5 font-mono">{((v/total)*100).toFixed(0)}%</div>
                 </div>
               </div>
             );
           })}
         </div>
       ))}
-      <div className="flex gap-3 mt-3 text-[10px] text-muted uppercase tracking-widest">
+      <div className="flex gap-3 mt-3 meta !text-[10px]">
         <span>rows: true label</span>
         <span>·</span>
         <span>columns: model prediction</span>

@@ -5,19 +5,19 @@ import { useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 
 const NUC_COLOR = {
-  A: '#2f6df1',    // adenine   — blue
-  T: '#e0a021',    // thymine   — amber
-  C: '#e0526d',    // cytosine  — rose
-  G: '#1fb885',    // guanine   — green
+  A: '#1F4E79',    // adenine   — deep blue
+  T: '#AD6A1A',    // thymine   — amber
+  C: '#CC0000',    // cytosine  — accent red
+  G: '#2E7D32',    // guanine   — green
 };
 const NUC_NAME = { A: 'Adenine', T: 'Thymine', C: 'Cytosine', G: 'Guanine' };
 const COMPLEMENT = { A: 'T', T: 'A', C: 'G', G: 'C' };
 
 const HELIX_RADIUS   = 1.4;
-const PITCH          = 0.42;        // vertical distance per base pair
-const TURN_RATE      = 0.60;        // radians per base pair (≈10.4 bp / turn)
-const BACKBONE_RGB_A = '#5eddec';
-const BACKBONE_RGB_B = '#8bf0da';
+const PITCH          = 0.42;
+const TURN_RATE      = 0.60;
+const BACKBONE_RGB_A = '#111111';
+const BACKBONE_RGB_B = '#525252';
 
 
 /* ===================================================================== *
@@ -47,12 +47,13 @@ export function Dna3DHelix({
 
   return (
     <div className="w-full flex flex-col gap-2">
-      <div className="relative rounded-2xl overflow-hidden border border-border/80"
-           style={{ height, background: 'radial-gradient(ellipse at 50% 20%, #cfeef4 0%, #9bd6e0 40%, #0f3b55 100%)' }}>
+      <div className="relative overflow-hidden border border-ink"
+           style={{ height,
+                    background: 'linear-gradient(180deg, #FFFFFF 0%, #F5F5F5 60%, #E5E5E0 100%)' }}>
         <Canvas camera={{ position: [0, 0.5, 9], fov: 42 }} dpr={[1, 1.75]}>
-          <ambientLight intensity={0.95}/>
+          <ambientLight intensity={1.1}/>
           <pointLight position={[6, 10, 10]} intensity={0.65}/>
-          <pointLight position={[-5, -4, -5]} intensity={0.35} color="#7fe3d4"/>
+          <pointLight position={[-5, -4, -5]} intensity={0.25} color="#F9F9F7"/>
 
           <HelixAssembly
             sequence={slicedSeq}
@@ -183,7 +184,7 @@ function BasePair({ r, globalIndex, isHighlight, altBase, onPick }) {
     }
   });
 
-  const rungColor = isHighlight ? '#f472b6' : hover ? '#fbbf24' : '#aedef1';
+  const rungColor = isHighlight ? '#CC0000' : hover ? '#AD6A1A' : '#111111';
   const rungWidth = isHighlight ? 4 : hover ? 2.4 : 1.6;
 
   const beadA_color = isHighlight && altBase && altBase !== r.baseA
@@ -228,7 +229,7 @@ function BasePair({ r, globalIndex, isHighlight, altBase, onPick }) {
       {/* floating base label for selected / hovered */}
       {(isHighlight || hover) && (
         <Billboard position={[r.start[0] * 1.6, r.start[1] + 0.18, r.start[2] * 1.6]}>
-          <Text fontSize={0.26} color={isHighlight ? '#ec4899' : '#0a2540'}
+          <Text fontSize={0.26} color={isHighlight ? '#CC0000' : '#111111'}
                 anchorX="center" outlineWidth={0.012} outlineColor="#ffffff">
             {r.baseA}·{globalIndex}
           </Text>

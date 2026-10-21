@@ -1,9 +1,15 @@
 export function Disclaimer() {
   return (
-    <div className="mt-12 text-[11px] text-muted border-t border-border/60 pt-4 leading-relaxed">
-      This platform is an academic/research prototype. Predictions are based on the selected
-      datasets and models and must <span className="text-rose font-medium">not</span> be interpreted as
-      clinical diagnosis or medical advice.
-    </div>
+    <footer className="mt-14 border-t-2 border-ink pt-5 pb-2">
+      <div className="flex items-start justify-between gap-6 flex-wrap">
+        <div className="text-[11px] text-prose max-w-3xl leading-relaxed font-prose">
+          BioVision is an academic research prototype. Analytical outputs reflect
+          the current warehouse snapshot and heuristic models; they must
+          <span className="text-accent font-sans font-bold uppercase tracking-wider"> not </span>
+          be interpreted as clinical diagnosis or medical advice.
+        </div>
+        <div className="meta">EST. 2025 · ONE PRINT, MANY MODELS</div>
+      </div>
+    </footer>
   );
 }

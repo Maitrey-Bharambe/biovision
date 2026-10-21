@@ -2,233 +2,318 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { api } from '../lib/api';
-import { Card } from '../components/Card';
 import { Hero } from '../components/Hero';
-import { TopBar } from '../components/dashboard/SearchBar';
+import { Ticker } from '../components/Ticker';
+import { FeatureSection } from '../components/FeatureSection';
 import { ChromosomeIdeogram } from '../components/dashboard/ChromosomeIdeogram';
 import { MutationDonut } from '../components/dashboard/MutationDonut';
-import { ProteinStructure } from '../components/dashboard/ProteinStructure';
-import { InsightsPanel } from '../components/dashboard/InsightsPanel';
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
   CartesianGrid, Legend,
 } from 'recharts';
 
-const AXIS = { fontSize: 11, stroke: '#5b7594' };
-const TIP  = { background: 'white', border: '1px solid #b8dfe6', borderRadius: 12, fontSize: 12, color: '#0a2540' };
+const AXIS = { fontSize: 10, stroke: '#525252' };
+const TIP  = { background: 'white', border: '1px solid #111111', borderRadius: 0, fontSize: 11, color: '#111111', fontFamily: 'JetBrains Mono, monospace' };
 
 export default function Overview() {
-  const [data, setData]         = useState(null);
-  const [rnaTP53, setRnaTP53]   = useState([]);
-  const [cvPred, setCvPred]     = useState(null);
-  const [geneDetail, setGD]     = useState(null);
+  const [data, setData]       = useState(null);
+  const [rnaTP53, setRnaTP53] = useState([]);
+  const [cvPred, setCvPred]   = useState(null);
 
   useEffect(() => {
     api.overview().then(setData);
     api.rna('gene=TP53&limit=40').then((rows) => {
       if (!rows) return;
-      // Bar-chart data: bucket samples by tissue with two series (healthy vs cancer)
       const buckets = {};
       rows.forEach(r => {
         buckets[r.tissue] = buckets[r.tissue] || { tissue: r.tissue, Healthy: 0, Cancer: 0, hn: 0, cn: 0 };
         if (r.condition === 'healthy')  { buckets[r.tissue].Healthy += r.tpm || 0; buckets[r.tissue].hn++; }
         else                             { buckets[r.tissue].Cancer  += r.tpm || 0; buckets[r.tissue].cn++; }
       });
-      const arr = Object.values(buckets).map(b => ({
+      setRnaTP53(Object.values(buckets).map(b => ({
         tissue: b.tissue,
         Healthy: b.hn ? Math.round(b.Healthy / b.hn) : 0,
         Cancer:  b.cn ? Math.round(b.Cancer  / b.cn) : 0,
-      }));
-      setRnaTP53(arr);
+      })));
     });
     api.cvPredict('abnormal').then(setCvPred);
-    api.gene('TP53').then(setGD);
   }, []);
 
   const totals = data?.totals || {};
+  const tickerItems = [
+    { label: 'Observations',    value: totals.observations ?? totals.samples ?? null },
+    { label: 'Genes',           value: totals.genes ?? null },
+    { label: 'Mutations',       value: totals.mutations ?? null },
+    { label: 'RNA Samples',     value: totals.rna_samples ?? null },
+    { label: 'Proteins',        value: totals.proteins ?? null },
+    { label: 'Indexed Images',  value: totals.images ?? null },
+    { label: 'Diseases',        value: totals.diseases ?? null },
+  ];
 
   return (
     <div>
-      <TopBar user="Researcher" />
-
       <Hero totals={totals} />
 
-      {/* Row 1: Genome Overview + RNA Expression + Protein Structure + Mutation Distribution */}
-      <div className="grid grid-cols-12 gap-5 mb-5">
-        <Card className="col-span-12 lg:col-span-6"
-              title="Genome Overview"
-              actions={<Selector value="Chromosome 17" />}>
-          <ChromosomeIdeogram chromosome="17" lengthMb={83.3}
-                              mutationPos={0.65} mutationLabel="TP53" />
-        </Card>
+      {/* Live warehouse ticker */}
+      <Ticker items={tickerItems} />
 
-        <Card className="col-span-12 md:col-span-6 lg:col-span-3" title="RNA Expression (TP53)">
-          <div className="h-52">
+      {/* ================= FEATURE GRID ================= */}
+      <div className="grid grid-cols-12 gap-5 mt-10">
+
+        <FeatureSection
+          index="01"
+          eyebrow="GENOMICS"
+          title="A chromosome, in print."
+          blurb="A clickable ideogram over the warehouse's gene coordinates. Mutation markers come from ClinVar &amp; COSMIC."
+          href="/genome"
+          cta="Enter the genome explorer →"
+          columns={8}
+        >
+          <div className="pt-2">
+            <ChromosomeIdeogram chromosome="17" lengthMb={83.3}
+                                mutationPos={0.65} mutationLabel="TP53" />
+          </div>
+        </FeatureSection>
+
+        <FeatureSection
+          index="02"
+          eyebrow="MUTATIONS"
+          title="Catalogue of change."
+          blurb="Distribution of variant consequences across the warehouse's mutation table."
+          href="/mutation"
+          cta="Open mutation analytics →"
+          columns={4}
+        >
+          <MutationDonut data={data?.mutation_by_type || []} total={totals.mutations} />
+        </FeatureSection>
+
+        <FeatureSection
+          index="03"
+          eyebrow="TRANSCRIPTOMICS"
+          title="TP53, by tissue."
+          blurb="Mean TPM for healthy vs. cancer samples, aggregated from the live RNA table."
+          href="/rna"
+          cta="Compare more genes →"
+          columns={7}
+        >
+          <div className="h-56">
             <ResponsiveContainer>
-              <BarChart data={rnaTP53} margin={{ left: -20, right: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e0eff2" vertical={false}/>
-                <XAxis dataKey="tissue" {...AXIS} tickLine={false} axisLine={false}/>
-                <YAxis {...AXIS} tickLine={false} axisLine={false}/>
+              <BarChart data={rnaTP53} margin={{ left: -16, right: 4, top: 10, bottom: 4 }}>
+                <CartesianGrid strokeDasharray="2 2" stroke="#11111120" vertical={false}/>
+                <XAxis dataKey="tissue" {...AXIS} tickLine={false} axisLine={{ stroke: '#111' }}/>
+                <YAxis {...AXIS} tickLine={false} axisLine={{ stroke: '#111' }}/>
                 <Tooltip contentStyle={TIP} />
-                <Legend wrapperStyle={{ fontSize: 11 }} iconType="circle" iconSize={7}/>
-                <Bar dataKey="Healthy" fill="#2f6df1" radius={[6,6,0,0]} maxBarSize={16}/>
-                <Bar dataKey="Cancer"  fill="#e56b8f" radius={[6,6,0,0]} maxBarSize={16}/>
+                <Legend wrapperStyle={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.14em' }} iconType="square" iconSize={8}/>
+                <Bar dataKey="Healthy" fill="#1F4E79" maxBarSize={18}/>
+                <Bar dataKey="Cancer"  fill="#CC0000" maxBarSize={18}/>
               </BarChart>
             </ResponsiveContainer>
           </div>
-        </Card>
+        </FeatureSection>
 
-        <Card className="col-span-12 md:col-span-6 lg:col-span-3"
-              title="Protein Structure"
-              actions={<Selector value="p53" />}>
-          <ProteinStructure gene="p53" />
-        </Card>
-      </div>
-
-      {/* Row 2: TP53 detail + Biological Image + Insights + Mutation Distribution */}
-      <div className="grid grid-cols-12 gap-5 mb-5">
-        {/* TP53 detail card */}
-        <Card className="col-span-12 lg:col-span-4" title="TP53" actions={<span className="pill">Tumor Suppressor</span>}>
-          <table className="w-full text-sm">
-            <tbody>
-              {[
-                ['Chromosome',   geneDetail?.chromosome   || '17'],
-                ['Position',     geneDetail?.start ? geneDetail.start.toLocaleString() : '7,668,421'],
-                ['Reference',    'C'],
-                ['Alternate',    'T'],
-                ['Mutation Type','SNP'],
-                ['Expression',   <span key="e" className="text-teal font-semibold">High (RNA-seq)</span>],
-              ].map(([k,v]) => (
-                <tr key={k} className="border-b border-border/40 last:border-0">
-                  <td className="py-2 text-muted">{k}</td>
-                  <td className="py-2 font-medium text-ink">{v}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <div className="mt-4 h-32 rounded-2xl bg-gradient-to-br from-[#eaf8fb] to-[#c8dcf0] flex items-center justify-center">
-            <CellIcon />
-          </div>
-        </Card>
-
-        {/* Biological Image (real CNN output) */}
-        <Card className="col-span-12 lg:col-span-4" title="Biological Image (Ultrasound)"
-              actions={<span className="text-muted text-lg cursor-pointer">⛶</span>}>
+        <FeatureSection
+          index="04"
+          eyebrow="COMPUTER VISION"
+          title="Ultrasound, interpreted."
+          blurb="A live inference pass from the trained CNN on a BreastMNIST patch, with model confidence."
+          href="/biovision"
+          cta="See Grad-CAM overlays →"
+          columns={5}
+        >
           {cvPred ? (
-            <div className="grid grid-cols-2 gap-3 items-center">
-              <img src={cvPred.original_image} alt="scan" className="w-full rounded-2xl border border-border shadow-card"
-                   style={{ imageRendering: 'pixelated' }}/>
+            <div className="grid grid-cols-2 gap-4 items-center pt-1">
+              <img src={cvPred.original_image} alt="ultrasound scan"
+                   className="w-full border border-ink"
+                   style={{ imageRendering: 'pixelated' }} />
               <div>
-                <div className="text-xs text-muted">Prediction</div>
-                <div className={`text-xl font-display font-bold ${cvPred.prediction === 'abnormal' ? 'text-rose' : 'text-teal'}`}>
+                <div className="eyebrow text-meta !text-[10px]">Prediction</div>
+                <div className={`font-display font-bold text-3xl mt-1 ${cvPred.prediction === 'abnormal' ? 'text-accent' : 'text-ink'}`}>
                   {cvPred.prediction === 'abnormal' ? 'Abnormal' : 'Normal'}
                 </div>
-                <div className="text-xs text-muted mt-3">Confidence</div>
-                <div className="text-3xl font-display font-bold text-ink metric-value">
+                <div className="eyebrow text-meta !text-[10px] mt-3">Confidence</div>
+                <div className="text-2xl metric-value mt-1">
                   {(cvPred.confidence * 100).toFixed(1)}%
                 </div>
-                <Link href="/biovision" className="mt-4 inline-flex items-center gap-2 text-sm text-ink font-medium">
-                  View Analysis
-                  <span className="w-6 h-6 rounded-full bg-deep text-white flex items-center justify-center text-xs">→</span>
-                </Link>
               </div>
             </div>
-          ) : <div className="text-muted text-sm">Running CV…</div>}
-          <div className="mt-3 text-[10px] text-muted">
-            Source: MedMNIST/BreastMNIST · real breast ultrasound patches
-          </div>
-        </Card>
+          ) : <div className="meta py-8">Running inference…</div>}
+        </FeatureSection>
 
-        {/* Insights */}
-        <Card className="col-span-12 lg:col-span-4" title="Insights">
-          <InsightsPanel items={[
-            { icon: 'correlation', title: 'Gene–Protein Correlation',
-              body: 'TP53 expression correlates with p53 protein abundance.',
-              href: '/protein' },
-            { icon: 'hotspot', title: 'Mutation Hotspot',
-              body: 'High mutation frequency observed in chromosome 17.',
-              href: '/mutation' },
-            { icon: 'cluster', title: 'Clustering Result',
-              body: 'Sample WDBC0104 falls into a distinct high-risk cluster.',
-              href: '/ai-lab' },
-          ]}/>
-        </Card>
+        <FeatureSection
+          index="05"
+          eyebrow="OLAP · ROLLUP · DRILL · SLICE · DICE · PIVOT"
+          title="A cube that answers back."
+          blurb="A real multidimensional engine over the star schema. Rotate the model, change a metric, and the graphs follow the query."
+          href="/olap"
+          cta="Open the OLAP workspace →"
+          columns={8}
+        >
+          <OlapPreview />
+        </FeatureSection>
+
+        <FeatureSection
+          index="06"
+          eyebrow="DNA EDITING LAB"
+          title="One base, many consequences."
+          blurb="A supported edit propagates to the mutation catalog, warehouse observations and compatible aggregates."
+          href="/alpha"
+          cta="Enter the laboratory →"
+          columns={4}
+        >
+          <HelixGlyph />
+        </FeatureSection>
+
+        <FeatureSection
+          index="07"
+          eyebrow="DATA MINING"
+          title="Clusters, rules, outliers."
+          blurb="K-Means and DBSCAN partitions over the sample dimension; Apriori rules over the clinical layer; Isolation-Forest anomaly scoring."
+          href="/ai-lab"
+          cta="Open the mining lab →"
+          columns={6}
+        >
+          <MiningGlyph />
+        </FeatureSection>
+
+        <FeatureSection
+          index="08"
+          eyebrow="WAREHOUSE"
+          title="Star schema, in black."
+          blurb="A visible dimensional model: fact table, dimensions, and the measurable quantities that connect them."
+          href="/warehouse"
+          cta="Inspect the schema →"
+          columns={6}
+        >
+          <SchemaGlyph />
+        </FeatureSection>
       </div>
 
-      {/* Row 3: Mutation Distribution donut */}
-      <div className="grid grid-cols-12 gap-5 mb-8">
-        <Card className="col-span-12 lg:col-span-5" title="Mutation Distribution">
-          <MutationDonut data={data?.mutation_by_type || []} total={totals.mutations} />
-        </Card>
+      <div className="rule-h-thick mt-10 mb-6" />
 
-        <Card className="col-span-12 lg:col-span-7"
-              title="Central biology"
-              subtitle="Every insight surfaces from the DNA → RNA → Protein → Cell → Phenotype chain">
-          <div className="flex items-center justify-around mt-4 flex-wrap gap-3">
-            {['DNA','GENE','RNA','PROTEIN','CELL','PHENOTYPE'].map((s, i, arr) => (
-              <div key={s} className="flex items-center gap-3">
-                <div className="flex flex-col items-center">
-                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-white to-[#d5eef4] border border-border flex items-center justify-center">
-                    <span className="text-teal text-xs font-semibold">{s}</span>
-                  </div>
-                </div>
-                {i < arr.length - 1 && <span className="text-teal">→</span>}
-              </div>
-            ))}
-          </div>
-          <div className="text-xs text-muted mt-6 text-center leading-relaxed">
-            Data sources: <span className="font-medium">Ensembl</span> (gene coordinates),
-            {' '}<span className="font-medium">UniProt</span> (proteins),
-            {' '}<span className="font-medium">ClinVar/COSMIC</span> (mutations),
-            {' '}<span className="font-medium">GTEx / TCGA-BRCA</span> (expression),
-            {' '}<span className="font-medium">UCI WDBC · Kaggle</span> (samples),
-            {' '}<span className="font-medium">MedMNIST</span> (imaging).
-          </div>
-        </Card>
-      </div>
-
-      {/* Footer strip */}
-      <div className="flex items-center justify-between text-xs text-muted pt-4 border-t border-border/60">
-        <div className="flex items-center gap-3">
-          <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-teal to-deep"/>
-          <span className="text-ink font-semibold">BioVision</span>
-          <span>v1.0.0</span>
+      <div className="grid grid-cols-12 gap-5 pb-4">
+        <div className="col-span-12 lg:col-span-8">
+          <div className="eyebrow mb-2">The chain, in brief</div>
+          <h3 className="font-display font-bold text-ink text-2xl md:text-3xl leading-tight">
+            DNA → Gene → RNA → Protein → Cell → Phenotype.
+          </h3>
+          <p className="font-prose text-prose text-[15px] mt-3 leading-snug max-w-3xl">
+            Every panel on this issue traces back to one of the links in the
+            central dogma. Sources: <em>Ensembl</em>, <em>UniProt</em>,
+            <em> ClinVar/COSMIC</em>, <em>GTEx / TCGA-BRCA</em>,
+            <em> UCI WDBC · Kaggle</em>, <em>MedMNIST</em>.
+          </p>
         </div>
-        <div>Integrating Data. Empowering Discovery.</div>
-        <div className="flex gap-5">
-          <Link href="/warehouse">About</Link>
-          <Link href="/warehouse">Documentation</Link>
-          <Link href="/demo">Contact</Link>
+        <div className="col-span-12 lg:col-span-4 lg:border-l lg:border-ink lg:pl-6">
+          <div className="eyebrow mb-2">Jump to</div>
+          <ul className="font-sans text-sm space-y-1">
+            <li><Link className="hover:underline" href="/olap">OLAP Workspace →</Link></li>
+            <li><Link className="hover:underline" href="/alpha">DNA Editor →</Link></li>
+            <li><Link className="hover:underline" href="/warehouse">Warehouse Schema →</Link></li>
+            <li><Link className="hover:underline" href="/demo">Live Demo Script →</Link></li>
+          </ul>
         </div>
       </div>
     </div>
   );
 }
 
-function Selector({ value }) {
+/* ========= Decorative glyphs (pure SVG, no fake data) ========= */
+function OlapPreview() {
   return (
-    <div className="pill !py-1.5 !px-3 gap-2">
-      {value}
-      <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2">
-        <path d="M2 4l4 4 4-4" strokeLinecap="round"/>
+    <div className="relative h-56 bg-subtle border border-ink flex items-center justify-center overflow-hidden">
+      <svg viewBox="-60 -60 120 120" className="w-56 h-56">
+        <g transform="rotate(-18)">
+          {Array.from({length: 3}).map((_,i)=>
+            Array.from({length: 3}).map((_,j)=>
+              Array.from({length: 3}).map((_,k)=>{
+                const x = (i-1)*18 + (j-1)*6;
+                const y = (k-1)*18 - (j-1)*5;
+                const sel = i===1 && j===1 && k===1;
+                return (
+                  <rect key={`${i}${j}${k}`}
+                    x={x-7} y={y-7} width="14" height="14"
+                    fill={sel ? '#CC0000' : '#FFFFFF'}
+                    stroke="#111111" strokeWidth="1"/>
+                );
+              })
+            )
+          )}
+        </g>
+      </svg>
+      <div className="absolute bottom-2 left-2 meta text-[9px]">
+        X · TIME &nbsp; Y · GENE &nbsp; Z · DISEASE
+      </div>
+      <div className="absolute top-2 right-2 badge">PREVIEW</div>
+    </div>
+  );
+}
+
+function HelixGlyph() {
+  const bases = Array.from({length: 14});
+  return (
+    <div className="h-56 flex items-center justify-center bg-subtle border border-ink">
+      <svg viewBox="0 0 200 220" className="h-full">
+        {bases.map((_,i) => {
+          const t = (i / (bases.length-1)) * Math.PI * 2.4;
+          const y = 15 + i * 14;
+          const x1 = 100 + Math.cos(t) * 40;
+          const x2 = 100 - Math.cos(t) * 40;
+          const isAccent = i === 7;
+          return (
+            <g key={i}>
+              <line x1={x1} y1={y} x2={x2} y2={y}
+                stroke={isAccent ? '#CC0000' : '#111111'}
+                strokeWidth={isAccent ? 2.5 : 1}/>
+              <circle cx={x1} cy={y} r="3" fill={isAccent ? '#CC0000' : '#111111'}/>
+              <circle cx={x2} cy={y} r="3" fill={isAccent ? '#CC0000' : '#111111'}/>
+            </g>
+          );
+        })}
       </svg>
     </div>
   );
 }
 
-function CellIcon() {
+function MiningGlyph() {
+  const pts = Array.from({length: 60}).map((_,i) => ({
+    x: 20 + (i*17 % 360),
+    y: 20 + ((i*29 + 11) % 160),
+    c: i % 3,
+  }));
+  const colors = ['#111111','#1F4E79','#CC0000'];
   return (
-    <svg width="72" height="72" viewBox="0 0 100 100">
-      <defs>
-        <radialGradient id="cIcon" cx="35%" cy="35%" r="65%">
-          <stop offset="0%" stopColor="#f0fbff"/>
-          <stop offset="60%" stopColor="#7c8fd6"/>
-          <stop offset="100%" stopColor="#37478f"/>
-        </radialGradient>
-      </defs>
-      <circle cx="50" cy="50" r="42" fill="url(#cIcon)"/>
-      <ellipse cx="40" cy="40" rx="16" ry="8" fill="#ffffff" opacity="0.5"/>
-      <circle cx="55" cy="55" r="12" fill="#0a2540" opacity="0.35"/>
-    </svg>
+    <div className="h-56 bg-subtle border border-ink p-2">
+      <svg viewBox="0 0 400 200" className="w-full h-full">
+        <rect x="0.5" y="0.5" width="399" height="199" fill="none" stroke="#11111120"/>
+        {pts.map((p,i) => (
+          <circle key={i} cx={p.x} cy={p.y} r={p.c===2?4:2.5}
+                  fill={colors[p.c]} stroke="#111" strokeWidth={p.c===2?1:0}/>
+        ))}
+      </svg>
+    </div>
+  );
+}
+
+function SchemaGlyph() {
+  const dims = ['SAMPLE','GENE','RNA','PROTEIN','MUTATION','DISEASE','IMAGE','TIME'];
+  return (
+    <div className="h-56 bg-subtle border border-ink relative overflow-hidden">
+      <svg viewBox="0 0 400 220" className="w-full h-full">
+        {dims.map((d, i) => {
+          const angle = (i / dims.length) * Math.PI * 2;
+          const x = 200 + Math.cos(angle) * 130;
+          const y = 110 + Math.sin(angle) * 80;
+          return (
+            <g key={d}>
+              <line x1="200" y1="110" x2={x} y2={y} stroke="#111" strokeWidth="1"/>
+              <rect x={x-28} y={y-10} width="56" height="20" fill="#FFFFFF" stroke="#111"/>
+              <text x={x} y={y+4} textAnchor="middle" fontSize="8" fontFamily="JetBrains Mono" fill="#111">{d}</text>
+            </g>
+          );
+        })}
+        <rect x="170" y="92" width="60" height="36" fill="#CC0000" stroke="#111"/>
+        <text x="200" y="114" textAnchor="middle" fontSize="10" fontFamily="JetBrains Mono" fill="#FFF" fontWeight="700">FACT</text>
+      </svg>
+    </div>
   );
 }

@@ -64,16 +64,16 @@ export function Dna3D({
            style={{ maxWidth: '100%' }}>
         <defs>
           <linearGradient id="dna3d-strandA" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%"   stopColor="#5eddec"/>
-            <stop offset="100%" stopColor="#0b5e68"/>
+            <stop offset="0%"   stopColor="#111111"/>
+            <stop offset="100%" stopColor="#525252"/>
           </linearGradient>
           <linearGradient id="dna3d-strandB" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%"   stopColor="#8bf0da"/>
-            <stop offset="100%" stopColor="#0a2540"/>
+            <stop offset="0%"   stopColor="#525252"/>
+            <stop offset="100%" stopColor="#111111"/>
           </linearGradient>
           <linearGradient id="dna3d-rung" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%"   stopColor="#0ea5b7"/>
-            <stop offset="100%" stopColor="#7fe3d4"/>
+            <stop offset="0%"   stopColor="#111111"/>
+            <stop offset="100%" stopColor="#737373"/>
           </linearGradient>
           <radialGradient id="dna3d-bead" cx="35%" cy="35%">
             <stop offset="0%"   stopColor="#ffffff" stopOpacity="0.9"/>
@@ -81,9 +81,8 @@ export function Dna3D({
           </radialGradient>
         </defs>
 
-        {/* Faint ring shadow behind the helix */}
         <ellipse cx={cx} cy={height - 10} rx={radius * 1.3} ry="5"
-                 fill="#0a2540" opacity="0.10"/>
+                 fill="#111111" opacity="0.10"/>
 
         {/* Continuous strand paths (SPLINE through all rungs) */}
         {(() => {
@@ -110,31 +109,30 @@ export function Dna3D({
           return (
             <g key={r.i} opacity={isHi ? 1 : rungOpacity + 0.05}>
               <line x1={r.xa} y1={r.y} x2={r.xb} y2={r.y}
-                    stroke={isHi ? '#e56b8f' : 'url(#dna3d-rung)'}
+                    stroke={isHi ? '#CC0000' : 'url(#dna3d-rung)'}
                     strokeWidth={isHi ? 4 : 2.2}
                     strokeLinecap="round" opacity={isHi ? 1 : rungOpacity}/>
 
-              {/* Nucleotide beads */}
               <circle cx={r.xa} cy={r.y} r={Math.max(3, beadRA)}
-                      fill={nucColor[base] || '#0ea5b7'}
-                      stroke={isHi ? '#e56b8f' : 'white'}
+                      fill={nucColor[base] || '#CC0000'}
+                      stroke={isHi ? '#CC0000' : '#111111'}
                       strokeWidth={isHi ? 2 : 1}/>
               <circle cx={r.xa} cy={r.y} r={Math.max(1.5, beadRA * 0.5)}
                       fill="url(#dna3d-bead)"/>
 
               <circle cx={r.xb} cy={r.y} r={Math.max(3, beadRB)}
-                      fill={nucColor[baseC] || '#0ea5b7'}
-                      stroke={isHi ? '#e56b8f' : 'white'}
+                      fill={nucColor[baseC] || '#CC0000'}
+                      stroke={isHi ? '#CC0000' : '#111111'}
                       strokeWidth={isHi ? 2 : 1}/>
               <circle cx={r.xb} cy={r.y} r={Math.max(1.5, beadRB * 0.5)}
                       fill="url(#dna3d-bead)"/>
 
               {isHi && (
                 <>
-                  <text x={r.xa} y={r.y - 8} fontSize="9" fill="#e56b8f"
-                        textAnchor="middle" fontWeight="700">{base}</text>
-                  <text x={r.xb} y={r.y - 8} fontSize="9" fill="#e56b8f"
-                        textAnchor="middle" fontWeight="700">{baseC}</text>
+                  <text x={r.xa} y={r.y - 8} fontSize="9" fill="#CC0000"
+                        fontFamily="JetBrains Mono" textAnchor="middle" fontWeight="700">{base}</text>
+                  <text x={r.xb} y={r.y - 8} fontSize="9" fill="#CC0000"
+                        fontFamily="JetBrains Mono" textAnchor="middle" fontWeight="700">{baseC}</text>
                 </>
               )}
             </g>

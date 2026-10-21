@@ -5,8 +5,10 @@ import { PageHeader } from '../../components/PageHeader';
 import { Card } from '../../components/Card';
 import { ChromosomeMap } from '../../components/genome/ChromosomeMap';
 import { DnaStrand } from '../../components/DnaStrand';
+import { useBioContext } from '../../components/BioContext';
 
 export default function GenomeExplorer() {
+  const ctx = useBioContext();
   const [genomes, setGenomes]           = useState([]);
   const [chromosomes, setChromosomes]   = useState([]);
   const [genes, setGenes]               = useState([]);
@@ -46,19 +48,21 @@ export default function GenomeExplorer() {
   useEffect(() => {
     if (!selectedGene) return;
     api.gene(selectedGene).then(setGeneDetail);
+    ctx.setContext({ gene: selectedGene, chromosome: chromosome?.chromosome_number ?? null });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedGene]);
 
   return (
     <div>
       <PageHeader
-        eyebrow="Explore"
-        title="Genome Explorer"
-        description="Organism → genome → chromosome → gene → mutation. Click any gene to see its DNA sequence, RNA expression, proteins and mutations."
+        eyebrow="GENOMICS"
+        title={<>A chromosome, <span className="italic font-normal">in print.</span></>}
+        description="Organism → genome → chromosome → gene → mutation. Click any gene to see its DNA sequence, RNA expression, proteins and mutations. The selected gene becomes the session's active context across pages."
       />
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <Card title="Genome">
-          <select className="w-full bg-panel2 border border-border rounded px-3 py-2 text-sm"
+          <select className="w-full px-3 py-2 text-sm"
                   value={genome || ''} onChange={(e) => setGenome(e.target.value)}>
             {genomes.map(g => (
               <option key={g.genome_id} value={g.genome_id}>
@@ -68,7 +72,7 @@ export default function GenomeExplorer() {
           </select>
         </Card>
         <Card title="Chromosome">
-          <select className="w-full bg-panel2 border border-border rounded px-3 py-2 text-sm"
+          <select className="w-full px-3 py-2 text-sm"
                   value={chromosome?.chromosome_number || ''}
                   onChange={(e) => setChromosome(chromosomes.find(c => c.chromosome_number === e.target.value))}>
             {chromosomes.map(c => (
@@ -79,7 +83,7 @@ export default function GenomeExplorer() {
           </select>
         </Card>
         <Card title="Gene">
-          <select className="w-full bg-panel2 border border-border rounded px-3 py-2 text-sm"
+          <select className="w-full px-3 py-2 text-sm"
                   value={selectedGene || ''} onChange={(e) => setSelectedGene(e.target.value)}>
             {genes.map(g => (
               <option key={g.gene_id} value={g.gene_name}>

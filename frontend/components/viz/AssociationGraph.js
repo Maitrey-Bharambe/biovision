@@ -28,7 +28,7 @@ export function AssociationGraph({ rules = [], width = 720, height = 460 }) {
     return { nodes: nds, edges: eds };
   }, [rules, width, height]);
 
-  if (!rules.length) return <div className="text-muted text-sm">No rules to plot.</div>;
+  if (!rules.length) return <div className="meta">No rules to plot.</div>;
 
   const nodeMap = Object.fromEntries(nodes.map(n => [n.id, n]));
   const maxLift = Math.max(1.5, ...edges.map(e => e.lift || 1));
@@ -38,18 +38,17 @@ export function AssociationGraph({ rules = [], width = 720, height = 460 }) {
       <defs>
         <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4"
                 orient="auto" markerUnits="strokeWidth">
-          <path d="M0,0 L8,4 L0,8" fill="#0ea5b7" opacity="0.6"/>
+          <path d="M0,0 L8,4 L0,8" fill="#111111"/>
         </marker>
       </defs>
-      {/* edges first (behind) */}
       {edges.map((e, i) => {
         const a = nodeMap[e.from], b = nodeMap[e.to];
         if (!a || !b) return null;
         const w = 0.5 + 3.5 * ((e.lift || 1) / maxLift);
         return (
           <line key={i} x1={a.x} y1={a.y} x2={b.x} y2={b.y}
-                stroke="#0ea5b7"
-                strokeOpacity={0.20 + 0.6 * (e.confidence || 0)}
+                stroke="#111111"
+                strokeOpacity={0.25 + 0.6 * (e.confidence || 0)}
                 strokeWidth={w}
                 markerEnd="url(#arrow)">
             <title>{`${e.from}  →  ${e.to}
@@ -57,30 +56,38 @@ support ${e.support}   confidence ${e.confidence}   lift ${e.lift}`}</title>
           </line>
         );
       })}
-      {/* nodes */}
       {nodes.map((n, i) => {
-        const [head, ...tailArr] = n.id.split(':');
-        const isMut  = head === 'mut';
-        const isExpr = head === 'expr';
-        const isDis  = head === 'disease';
-        const isCond = head === 'condition';
-        const fill = isMut ? '#e56b8f' : isExpr ? '#4dd0e1' : isDis ? '#0a2540' : isCond ? '#f4b942' : '#0ea5b7';
+        const [head] = n.id.split(':');
+        const palette = {
+          mut: '#CC0000', expr: '#1F4E79', disease: '#111111', condition: '#AD6A1A',
+        };
+        const fill = palette[head] || '#525252';
         const short = n.id.length > 22 ? n.id.slice(0, 20) + '…' : n.id;
         return (
           <g key={i}>
-            <circle cx={n.x} cy={n.y} r="7" fill={fill} stroke="white" strokeWidth="2"/>
-            <rect x={n.x + 10} y={n.y - 9} width={short.length * 6.5 + 8} height="18" rx="8"
-                  fill="white" opacity="0.9" stroke="rgba(10,37,64,0.1)"/>
-            <text x={n.x + 14} y={n.y + 4} fontSize="10" fill="#0a2540" fontWeight="500">{short}</text>
+            <rect x={n.x-5} y={n.y-5} width="10" height="10" fill={fill} stroke="#111111"/>
+            <rect x={n.x + 10} y={n.y - 9} width={short.length * 6.5 + 8} height="18"
+                  fill="#FFFFFF" stroke="#111111"/>
+            <text x={n.x + 14} y={n.y + 4} fontSize="10" fill="#111111"
+                  fontFamily="JetBrains Mono" fontWeight="500">{short}</text>
           </g>
         );
       })}
-      {/* legend */}
-      <g transform="translate(20, 20)" fontSize="10">
-        <circle r="4" fill="#e56b8f"/><text x="10" y="4" fill="#5b7594">mutation</text>
-        <g transform="translate(0,18)"><circle r="4" fill="#4dd0e1"/><text x="10" y="4" fill="#5b7594">expression</text></g>
-        <g transform="translate(0,36)"><circle r="4" fill="#0a2540"/><text x="10" y="4" fill="#5b7594">disease</text></g>
-        <g transform="translate(0,54)"><circle r="4" fill="#f4b942"/><text x="10" y="4" fill="#5b7594">condition</text></g>
+      <g transform="translate(20, 20)" fontSize="10" fontFamily="Inter">
+        <rect x="-4" y="0" width="8" height="8" fill="#CC0000"/>
+        <text x="10" y="8" fill="#525252">mutation</text>
+        <g transform="translate(0,16)">
+          <rect x="-4" y="0" width="8" height="8" fill="#1F4E79"/>
+          <text x="10" y="8" fill="#525252">expression</text>
+        </g>
+        <g transform="translate(0,32)">
+          <rect x="-4" y="0" width="8" height="8" fill="#111111"/>
+          <text x="10" y="8" fill="#525252">disease</text>
+        </g>
+        <g transform="translate(0,48)">
+          <rect x="-4" y="0" width="8" height="8" fill="#AD6A1A"/>
+          <text x="10" y="8" fill="#525252">condition</text>
+        </g>
       </g>
     </svg>
   );

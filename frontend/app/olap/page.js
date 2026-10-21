@@ -30,12 +30,12 @@ export default function OlapPage() {
   return (
     <div>
       <PageHeader
-        eyebrow="Live OLAP Cube"
-        title="Interactive Multidimensional Data Warehouse Explorer"
+        eyebrow="OLAP LABORATORY"
+        title={<>A cube that <span className="italic font-normal">answers back.</span></>}
         description="Every fact in FACT_BIOLOGICAL_OBSERVATION mapped into a 3-D cube. Roll-up, drill-down, slice, dice and pivot — each button issues a real SQL aggregation, each transition animates the analytical view."
       />
 
-      <div className="flex gap-2 mb-4 flex-wrap">
+      <div className="flex gap-0 mb-5 flex-wrap border-y border-ink">
         <ViewTab active={view === 'cube'}   onClick={() => setView('cube')}  label="3D Cube"/>
         <ViewTab active={view === 'table'}  onClick={() => setView('table')} label="Table View"/>
         <ViewTab active={view === 'domain'} onClick={() => setView('domain')} label="Domain OLAP · Warehouse / AlphaGenome / CV"/>
@@ -49,9 +49,10 @@ export default function OlapPage() {
 function ViewTab({ active, onClick, label }) {
   return (
     <button onClick={onClick}
-            className={`px-4 py-2 text-sm rounded-full border ${
-              active ? 'bg-deep text-white border-deep' : 'bg-white text-ink border-border'
-            }`}>{label}</button>
+            className={`px-5 py-2.5 text-[11px] font-sans font-bold uppercase tracking-[0.18em] border-r border-ink last:border-r-0 transition
+              ${active ? 'bg-ink text-paper' : 'bg-white text-ink hover:bg-muted'}`}>
+      {label}
+    </button>
   );
 }
 
@@ -281,7 +282,7 @@ function LoadingBox() {
 }
 function LoadingBadge() {
   return (
-    <div className="absolute top-3 right-3 z-20 text-[10px] px-2 py-1 rounded-full bg-white/10 text-cube-accent border border-white/10">
+    <div className="absolute top-3 right-3 z-20 text-[10px] uppercase tracking-[0.2em] font-sans font-bold px-2 py-1 bg-ink text-paper border border-ink">
       loading…
     </div>
   );

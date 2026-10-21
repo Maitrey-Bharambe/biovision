@@ -14,15 +14,15 @@ export function InsightsPanel({ items = [] }) {
     <div className="space-y-2">
       {items.map((it, i) => (
         <Link key={i} href={it.href || '#'}
-          className="flex items-start gap-3 px-4 py-3 rounded-2xl border border-border/60 bg-white/70 hover:bg-white transition group">
-          <div className="w-9 h-9 shrink-0 rounded-xl bg-[#eaf8fb] text-teal flex items-center justify-center">
+          className="flex items-start gap-3 px-4 py-3 border border-ink bg-white hover:bg-subtle transition group">
+          <div className="w-9 h-9 shrink-0 bg-ink text-paper flex items-center justify-center">
             {ICONS[it.icon] || ICONS.correlation}
           </div>
           <div className="flex-1 min-w-0">
-            <div className="text-sm font-semibold text-ink">{it.title}</div>
-            <div className="text-xs text-muted mt-0.5 leading-snug">{it.body}</div>
+            <div className="eyebrow !text-[10px] text-ink">{it.title}</div>
+            <div className="text-sm font-prose text-prose mt-1 leading-snug">{it.body}</div>
           </div>
-          <div className="text-muted group-hover:text-ink text-lg">›</div>
+          <div className="text-meta group-hover:text-accent text-lg font-sans">›</div>
         </Link>
       ))}
     </div>

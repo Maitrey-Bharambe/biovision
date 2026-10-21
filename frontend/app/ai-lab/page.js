@@ -12,9 +12,10 @@ import {
   ResponsiveContainer, CartesianGrid, Cell,
 } from 'recharts';
 
-const AXIS = { fontSize: 11, stroke: '#5b7594' };
-const TIP  = { background: 'white', border: '1px solid #b8dfe6', borderRadius: 12, fontSize: 12, color: '#0a2540' };
+const AXIS = { fontSize: 10, stroke: '#525252' };
+const TIP  = { background: '#FFFFFF', border: '1px solid #111111', borderRadius: 0, fontSize: 11, color: '#111111', fontFamily: 'JetBrains Mono, monospace' };
 const TABS = ['Classification', 'Clustering', 'Association', 'Anomaly'];
+const CAT  = ['#111111', '#1F4E79', '#2E7D32', '#AD6A1A', '#6B3FA0', '#CC0000'];
 
 export default function AiLab() {
   const [tab, setTab] = useState('Classification');
@@ -33,18 +34,20 @@ export default function AiLab() {
   return (
     <div>
       <PageHeader
-        eyebrow="Intelligence"
-        title="AI & Mining Lab"
-        description="Four data-mining modules trained on the real warehouse. Every tab shows model metrics, its errors, and the samples it flagged."
+        eyebrow="DATA MINING"
+        title={<>Clusters, rules, <span className="italic font-normal">outliers.</span></>}
+        description="Four data-mining modules trained on the real warehouse. Each tab shows model metrics, its errors, and the samples it flagged."
       />
 
-      <div className="flex gap-2 mb-6 border-b border-border/60">
-        {TABS.map(t => (
+      <div className="flex border-y-2 border-ink mb-6 overflow-x-auto">
+        {TABS.map((t, i) => (
           <button key={t}
-                  className={`px-4 py-2 text-sm border-b-2 ${
-                    tab === t ? 'border-teal text-ink font-semibold' : 'border-transparent text-muted hover:text-ink'
-                  }`}
-                  onClick={() => setTab(t)}>{t}</button>
+                  onClick={() => setTab(t)}
+                  className={`flex items-center gap-3 px-5 py-3 border-r border-ink last:border-r-0 text-left transition
+                    ${tab === t ? 'bg-ink text-paper' : 'bg-paper text-ink hover:bg-subtle'}`}>
+            <span className="font-mono text-xs opacity-60">§ 0{i+1}</span>
+            <span className="font-sans text-[12px] font-bold tracking-[0.18em] uppercase">{t}</span>
+          </button>
         ))}
       </div>
 
@@ -138,7 +141,7 @@ function ClassificationTab({ data }) {
                 <XAxis type="number" {...AXIS}/>
                 <YAxis type="category" dataKey="feature" {...AXIS} width={160} tickLine={false} axisLine={false}/>
                 <Tooltip contentStyle={TIP}/>
-                <Bar dataKey="importance" fill="#0ea5b7" radius={[0,10,10,0]}/>
+                <Bar dataKey="importance" fill="#111111"/>
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -149,11 +152,11 @@ function ClassificationTab({ data }) {
             subtitle="The classifier runs live on your inputs">
         <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-4">
           {(data.features || []).slice(0, 10).map(f => (
-            <label key={f} className="text-xs text-muted">
-              {f.replace(/_/g, ' ')}
+            <label key={f} className="text-xs text-prose font-prose">
+              <span className="eyebrow !text-[9px] text-meta block mb-1">{f.replace(/_/g, ' ')}</span>
               <input type="number" step="0.01" value={inp[f] ?? 0}
                      onChange={(e) => setInp(prev => ({ ...prev, [f]: Number(e.target.value) }))}
-                     className="mt-1 w-full bg-white border border-border rounded px-2 py-1 text-sm"/>
+                     className="w-full px-2 py-1 text-sm"/>
             </label>
           ))}
         </div>
@@ -165,11 +168,11 @@ function ClassificationTab({ data }) {
                    label="P(diseased)"/>
             <div>
               <div className="text-3xl font-display font-bold"
-                   style={{ color: pred.prediction === 'diseased' ? '#e56b8f' : '#0ea5b7' }}>
+                   style={{ color: pred.prediction === 'diseased' ? '#CC0000' : '#111111' }}>
                 {pred.prediction === 'diseased' ? 'Diseased' : 'Healthy'}
               </div>
               {pred.probabilities && (
-                <div className="text-sm text-muted mt-1">
+                <div className="text-sm meta mt-1 font-mono">
                   healthy {(pred.probabilities.healthy*100).toFixed(1)}% · diseased {(pred.probabilities.diseased*100).toFixed(1)}%
                 </div>
               )}
@@ -185,8 +188,8 @@ function ClassificationTab({ data }) {
 /*  CLUSTERING                                                         */
 /* ================================================================= */
 function ClusteringTab({ data }) {
-  if (!data) return <div className="text-muted">Train clustering first.</div>;
-  const colors = ['#0ea5b7', '#e56b8f', '#f4b942', '#7fe3d4', '#a78bfa'];
+  if (!data) return <div className="meta">Train clustering first.</div>;
+  const colors = CAT;
   const sizes = data.kmeans?.cluster_sizes || {};
   const total = Object.values(sizes).reduce((a,b)=>a+b,0) || 1;
 
@@ -214,15 +217,15 @@ function ClusteringTab({ data }) {
               return (
                 <div key={id}>
                   <div className="flex justify-between text-xs mb-1">
-                    <span className="text-ink font-semibold">
-                      <span className="inline-block w-3 h-3 rounded-full mr-2 align-middle"
+                    <span className="text-ink font-sans font-bold uppercase tracking-[0.14em] text-[10px] flex items-center gap-2">
+                      <span className="inline-block w-3 h-3 border border-ink"
                             style={{ background: colors[i % colors.length] }}/>
                       Cluster {id}
                     </span>
-                    <span className="text-muted">{n} samples · {pct.toFixed(0)}%</span>
+                    <span className="meta !text-[10px]">{n} samples · {pct.toFixed(0)}%</span>
                   </div>
-                  <div className="h-2 rounded-full bg-[#eaf8fb]">
-                    <div className="h-full rounded-full"
+                  <div className="h-2 border border-ink bg-subtle">
+                    <div className="h-full"
                          style={{ background: colors[i % colors.length], width: `${pct}%` }}/>
                   </div>
                 </div>
@@ -238,8 +241,8 @@ function ClusteringTab({ data }) {
           <ResponsiveContainer>
             <ScatterChart>
               <CartesianGrid strokeDasharray="3 3" stroke="#e0eff2"/>
-              <XAxis type="number" dataKey="x" stroke="#5b7594" fontSize={11} name="PC1"/>
-              <YAxis type="number" dataKey="y" stroke="#5b7594" fontSize={11} name="PC2"/>
+              <XAxis type="number" dataKey="x" {...AXIS} axisLine={{ stroke:'#111' }} tickLine={false} name="PC1"/>
+              <YAxis type="number" dataKey="y" {...AXIS} axisLine={{ stroke:'#111' }} tickLine={false} name="PC2"/>
               <ZAxis dataKey="sample_id" range={[80,80]}/>
               <Tooltip contentStyle={TIP} cursor={{ strokeDasharray:'3 3' }}/>
               <Scatter data={data.points}>
@@ -342,7 +345,7 @@ function AnomalyTab({ data }) {
                 <Tooltip contentStyle={TIP}/>
                 <Scatter data={data.samples.map((s,i)=>({ idx:i, ...s }))}>
                   {data.samples.map((s,i)=>(
-                    <Cell key={i} fill={s.anomaly ? '#e56b8f' : '#0ea5b7'}/>
+                    <Cell key={i} fill={s.anomaly ? '#CC0000' : '#111111'}/>
                   ))}
                 </Scatter>
               </ScatterChart>

@@ -24,7 +24,7 @@ export function ChromosomeIdeogram({
     [0.05, 3, 'q21.3'],[0.03, 0, 'q22'],  [0.05, 2, 'q23'], [0.03, 0, ''],
     [0.05, 3, 'q24'],  [0.03, 0, 'q25.1'],[0.05, 2, 'q25.3'],
   ];
-  const shadeColors = ['#ffffff','#c8e6ec','#5b7594','#0a2540','#0a2540'];
+  const shadeColors = ['#FFFFFF','#F5F5F5','#999999','#111111','#111111'];
 
   const width = 700, cy = 40, h = 34, pad = 30;
   const trackW = width - 2 * pad;
@@ -38,20 +38,20 @@ export function ChromosomeIdeogram({
     if (isCentromere) {
       shapes.push(
         <g key={i}>
-          <path d={`M${x} ${cy-h/2} L${x+bw/2} ${cy} L${x} ${cy+h/2} Z`} fill="#8fa4bd"/>
-          <path d={`M${x+bw} ${cy-h/2} L${x+bw/2} ${cy} L${x+bw} ${cy+h/2} Z`} fill="#8fa4bd"/>
+          <path d={`M${x} ${cy-h/2} L${x+bw/2} ${cy} L${x} ${cy+h/2} Z`} fill="#737373"/>
+          <path d={`M${x+bw} ${cy-h/2} L${x+bw/2} ${cy} L${x+bw} ${cy+h/2} Z`} fill="#737373"/>
         </g>
       );
     } else {
       shapes.push(
         <rect key={i} x={x} y={cy - h/2} width={bw} height={h}
-              fill={shadeColors[s]} stroke="rgba(10,37,64,0.25)" strokeWidth="0.5"/>
+              fill={shadeColors[s]} stroke="#111111" strokeWidth="0.5"/>
       );
     }
     if (name) {
       shapes.push(
         <text key={`t${i}`} x={x + bw/2} y={cy + h/2 + 12}
-              textAnchor="middle" fontSize="9" fill="#5b7594">{name}</text>
+              textAnchor="middle" fontSize="9" fill="#525252" fontFamily="JetBrains Mono">{name}</text>
       );
     }
     x += bw;
@@ -60,7 +60,7 @@ export function ChromosomeIdeogram({
   // rounded outline
   const outline = (
     <rect x={pad} y={cy - h/2} width={trackW} height={h}
-          rx={h/2} fill="none" stroke="#0a2540" strokeWidth="1.4"/>
+          rx={h/2} fill="none" stroke="#111111" strokeWidth="1.4"/>
   );
 
   // mutation marker
@@ -70,7 +70,8 @@ export function ChromosomeIdeogram({
   const axis = [];
   for (let i = 0; i <= 5; i++) {
     const ax = pad + (i / 5) * trackW;
-    axis.push(<text key={i} x={ax} y={cy + h/2 + 34} fontSize="10" fill="#5b7594" textAnchor="middle">
+    axis.push(<text key={i} x={ax} y={cy + h/2 + 34} fontSize="10" fill="#525252"
+                      fontFamily="JetBrains Mono" textAnchor="middle">
       {Math.round((i / 5) * lengthMb)} Mb
     </text>);
   }
@@ -88,23 +89,23 @@ export function ChromosomeIdeogram({
 
       {/* mutation marker */}
       <line x1={mutX} x2={mutX} y1={cy - h/2 - 12} y2={cy + h/2 + 12}
-            stroke="#e56b8f" strokeWidth="2"/>
-      <circle cx={mutX} cy={cy - h/2 - 18} r="6" fill="#e56b8f"/>
-      <circle cx={mutX} cy={cy - h/2 - 18} r="10" fill="#e56b8f" opacity="0.25"/>
-      <text x={mutX} y={cy - h/2 - 26} textAnchor="middle" fontSize="10" fill="#0a2540" fontWeight="600">
+            stroke="#CC0000" strokeWidth="2"/>
+      <rect x={mutX-6} y={cy - h/2 - 24} width="12" height="12" fill="#CC0000"/>
+      <text x={mutX} y={cy - h/2 - 30} textAnchor="middle" fontSize="10" fill="#111111"
+            fontFamily="JetBrains Mono" fontWeight="700">
         {mutationLabel}
       </text>
 
       {axis}
 
       {/* legend */}
-      <g transform={`translate(${pad}, ${cy + h/2 + 46})`}>
-        <circle cx="4" cy="4" r="4" fill="#0ea5b7"/>
-        <text x="14" y="7" fontSize="10" fill="#5b7594">Genes</text>
-        <circle cx="70" cy="4" r="4" fill="#e56b8f"/>
-        <text x="80" y="7" fontSize="10" fill="#5b7594">Mutations</text>
-        <circle cx="150" cy="4" r="4" fill="#7fe3d4"/>
-        <text x="160" y="7" fontSize="10" fill="#5b7594">High Expression</text>
+      <g transform={`translate(${pad}, ${cy + h/2 + 46})`} fontFamily="Inter">
+        <rect x="0" y="1" width="8" height="8" fill="#111111"/>
+        <text x="14" y="9" fontSize="10" fill="#525252">Gene bands</text>
+        <rect x="80" y="1" width="8" height="8" fill="#CC0000"/>
+        <text x="94" y="9" fontSize="10" fill="#525252">Mutations</text>
+        <rect x="170" y="1" width="8" height="8" fill="#2E7D32"/>
+        <text x="184" y="9" fontSize="10" fill="#525252">High expression</text>
       </g>
     </svg>
   );

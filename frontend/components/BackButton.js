@@ -2,9 +2,6 @@
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 
-/** Back button used on interior pages. Hidden on the Home ("/") route.
- *  When there is no browser history to pop, falls back to Home.
- */
 export function BackButton({ label = 'Back', to }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -21,17 +18,15 @@ export function BackButton({ label = 'Back', to }) {
   };
 
   return (
-    <div className="flex items-center gap-3 mb-6">
+    <div className="flex items-center gap-4 mb-6">
       <button
         onClick={go}
-        className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-white border border-border shadow-card text-sm text-ink hover:bg-[#eaf8fb] transition"
+        className="inline-flex items-center gap-2 px-3 py-1.5 border border-ink bg-white text-xs font-bold tracking-[0.18em] uppercase text-ink hover:bg-ink hover:text-white transition"
       >
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <path d="M15 6l-6 6 6 6" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
+        <span aria-hidden>←</span>
         {label}
       </button>
-      <Link href="/" className="text-xs text-muted hover:text-ink">Home</Link>
+      <Link href="/" className="meta hover:text-ink">↩ Home</Link>
     </div>
   );
 }

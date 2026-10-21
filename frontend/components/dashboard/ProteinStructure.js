@@ -15,20 +15,17 @@ export function ProteinStructure({ gene = 'p53' }) {
       <svg viewBox="0 0 320 220" className="w-full h-full">
         <defs>
           <linearGradient id="rib1" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%"  stopColor="#a5c7f8"/>
-            <stop offset="100%" stopColor="#3d61c1"/>
+            <stop offset="0%"  stopColor="#CCCCCC"/>
+            <stop offset="100%" stopColor="#111111"/>
           </linearGradient>
           <linearGradient id="rib2" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%"  stopColor="#c9b8f4"/>
-            <stop offset="100%" stopColor="#6a44b8"/>
+            <stop offset="0%"  stopColor="#999999"/>
+            <stop offset="100%" stopColor="#1F4E79"/>
           </linearGradient>
           <linearGradient id="rib3" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%"  stopColor="#7fe3d4"/>
-            <stop offset="100%" stopColor="#0ea5b7"/>
+            <stop offset="0%"  stopColor="#111111"/>
+            <stop offset="100%" stopColor="#CC0000"/>
           </linearGradient>
-          <filter id="softshadow" x="-20%" y="-20%" width="140%" height="140%">
-            <feGaussianBlur stdDeviation="2"/>
-          </filter>
         </defs>
 
         {/* helix 1 — spiral */}
@@ -40,7 +37,7 @@ export function ProteinStructure({ gene = 'p53' }) {
             const y = i * 8 - 55;
             return (
               <ellipse key={i} cx={x} cy={y} rx="22" ry="8"
-                       fill="url(#rib1)" opacity={0.85} filter="url(#softshadow)"/>
+                       fill="url(#rib1)" stroke="#111" strokeWidth="0.5" opacity={0.9}/>
             );
           })}
         </g>
@@ -54,7 +51,7 @@ export function ProteinStructure({ gene = 'p53' }) {
             const y = i * 8 - 40;
             return (
               <ellipse key={i} cx={x} cy={y} rx="18" ry="7"
-                       fill="url(#rib2)" opacity={0.9} filter="url(#softshadow)"/>
+                       fill="url(#rib2)" stroke="#111" strokeWidth="0.5" opacity={0.9}/>
             );
           })}
         </g>
@@ -67,7 +64,7 @@ export function ProteinStructure({ gene = 'p53' }) {
         {/* backbone dots */}
         {[...Array(20)].map((_, i) => (
           <circle key={i} cx={40 + i * 12 + rand(4)} cy={200 - Math.sin(i * 0.6) * 12}
-                  r="2" fill="#0a2540" opacity="0.35"/>
+                  r="2" fill="#111111" opacity="0.5"/>
         ))}
       </svg>
 

@@ -10,7 +10,8 @@ export default function Samples() {
   useEffect(() => { api.samples().then(v => setRows(v || [])); }, []);
   return (
     <div>
-      <PageHeader eyebrow="Samples" title="Sample browser"
+      <PageHeader eyebrow="SAMPLES"
+        title={<>The <span className="italic font-normal">roll call.</span></>}
         description="Open any sample to see its complete cross-modality profile." />
       <Card>
         <div className="scrollbox">
@@ -19,12 +20,12 @@ export default function Samples() {
             <tbody>
               {rows.map((s) => (
                 <tr key={s.sample_id}>
-                  <td className="font-medium">{s.sample_id}</td>
+                  <td className="font-mono">{s.sample_id}</td>
                   <td>{s.tissue}</td>
-                  <td className={s.condition==='diseased' ? 'text-warn' : 'text-good'}>{s.condition}</td>
-                  <td>{s.age_bucket}</td>
+                  <td className={s.condition==='diseased' ? 'text-accent font-sans font-semibold' : 'text-ink'}>{s.condition}</td>
+                  <td className="num">{s.age_bucket}</td>
                   <td>{s.sex}</td>
-                  <td><Link className="text-accent underline" href={`/sample/${s.sample_id}`}>open →</Link></td>
+                  <td><Link className="text-accent font-sans font-bold uppercase tracking-[0.14em] text-[10px] underline-offset-4 hover:underline" href={`/sample/${s.sample_id}`}>open →</Link></td>
                 </tr>
               ))}
             </tbody>

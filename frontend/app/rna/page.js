@@ -7,40 +7,48 @@ import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
 } from 'recharts';
 
+const TIP = { background: '#FFFFFF', border: '1px solid #111111', borderRadius: 0, fontSize: 11, color: '#111111', fontFamily: 'JetBrains Mono, monospace' };
+const AXIS = { fontSize: 10, stroke: '#525252' };
+
+/* A monochrome-ink heatmap, newspaper style. */
 function Heatmap({ data }) {
-  if (!data || !data.length) return <div className="text-muted text-sm">Loading heatmap…</div>;
+  if (!data || !data.length) return <div className="meta">Loading heatmap…</div>;
   const genes    = [...new Set(data.map(d => d.gene))].slice(0, 18);
   const tissues  = [...new Set(data.map(d => d.tissue))];
   const map      = new Map(data.map(d => [`${d.gene}|${d.tissue}`, d.value]));
   const max      = Math.max(...data.map(d => d.value || 0));
 
   const color = (v) => {
-    if (!v) return '#0b1120';
+    if (!v) return '#F5F5F5';
     const t = Math.min(1, v / (max || 1));
-    const r = Math.round(56 + t * 200);
-    const g = Math.round(189 - t * 100);
-    const b = Math.round(248 - t * 100);
+    // Interpolate paper → ink with a touch of red at the top end.
+    const r = Math.round(249 - t * (249 - 204));
+    const g = Math.round(249 - t * (249 -  0));
+    const b = Math.round(247 - t * (247 -  0));
     return `rgb(${r},${g},${b})`;
   };
 
   return (
-    <div className="overflow-auto">
-      <table className="text-xs border-collapse">
+    <div className="overflow-auto border border-ink">
+      <table className="text-xs border-collapse w-full">
         <thead>
-          <tr>
-            <th className="p-1 text-left text-muted">Gene</th>
-            {tissues.map(t => <th key={t} className="p-1 text-muted text-[10px]">{t}</th>)}
+          <tr className="bg-subtle border-b-2 border-ink">
+            <th className="p-2 text-left eyebrow !text-[9px] text-ink">Gene</th>
+            {tissues.map(t => (
+              <th key={t} className="p-2 eyebrow !text-[9px] text-ink">{t}</th>
+            ))}
           </tr>
         </thead>
         <tbody>
-          {genes.map(g => (
-            <tr key={g}>
-              <td className="p-1 font-medium">{g}</td>
+          {genes.map((g, gi) => (
+            <tr key={g} className={gi%2 ? 'bg-subtle' : ''}>
+              <td className="p-1 font-sans font-semibold text-ink border-r border-ink">{g}</td>
               {tissues.map(t => {
                 const v = map.get(`${g}|${t}`);
                 return (
-                  <td key={t} className="p-0">
-                    <div className="w-9 h-6 rounded-sm m-0.5" title={`${g} · ${t} · ${v?.toFixed?.(2) ?? '—'}`}
+                  <td key={t} className="p-0 border-r border-ink last:border-r-0">
+                    <div className="w-full h-7"
+                         title={`${g} · ${t} · ${v?.toFixed?.(2) ?? '—'}`}
                          style={{ background: color(v) }} />
                   </td>
                 );
@@ -49,6 +57,11 @@ function Heatmap({ data }) {
           ))}
         </tbody>
       </table>
+      <div className="flex items-center gap-2 p-2 border-t border-ink bg-white">
+        <span className="meta !text-[9px]">0</span>
+        <div className="flex-1 h-2" style={{ background: 'linear-gradient(90deg, #F9F9F7 0%, #AD6A1A 60%, #CC0000 100%)', border:'1px solid #111'}}/>
+        <span className="meta !text-[9px]">max TPM</span>
+      </div>
     </div>
   );
 }
@@ -68,8 +81,8 @@ export default function RnaExplorer() {
   return (
     <div>
       <PageHeader
-        eyebrow="Explore"
-        title="RNA Explorer"
+        eyebrow="TRANSCRIPTOMICS"
+        title={<>Expression, <span className="italic font-normal">by tissue.</span></>}
         description="Gene expression across tissues and conditions. High-expression genes are potential biomarkers; low-expression genes may indicate silencing."
       />
 
@@ -78,11 +91,11 @@ export default function RnaExplorer() {
           <div className="h-72">
             <ResponsiveContainer>
               <BarChart data={top.up} layout="vertical" margin={{ left: 40 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1f2a44" />
-                <XAxis type="number" stroke="#94a3b8" fontSize={11} />
-                <YAxis type="category" dataKey="gene" stroke="#94a3b8" fontSize={11} width={60} />
-                <Tooltip contentStyle={{ background: '#0b1120', border: '1px solid #1f2a44', fontSize: 12 }} />
-                <Bar dataKey="mean_expression" fill="#34d399" radius={[0,6,6,0]} />
+                <CartesianGrid strokeDasharray="2 2" stroke="#11111118"/>
+                <XAxis type="number" {...AXIS} axisLine={{ stroke:'#111' }} tickLine={false}/>
+                <YAxis type="category" dataKey="gene" {...AXIS} axisLine={{ stroke:'#111' }} tickLine={false} width={60} />
+                <Tooltip contentStyle={TIP} />
+                <Bar dataKey="mean_expression" fill="#2E7D32"/>
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -92,11 +105,11 @@ export default function RnaExplorer() {
           <div className="h-72">
             <ResponsiveContainer>
               <BarChart data={top.down} layout="vertical" margin={{ left: 40 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1f2a44" />
-                <XAxis type="number" stroke="#94a3b8" fontSize={11} />
-                <YAxis type="category" dataKey="gene" stroke="#94a3b8" fontSize={11} width={60} />
-                <Tooltip contentStyle={{ background: '#0b1120', border: '1px solid #1f2a44', fontSize: 12 }} />
-                <Bar dataKey="mean_expression" fill="#f87171" radius={[0,6,6,0]} />
+                <CartesianGrid strokeDasharray="2 2" stroke="#11111118"/>
+                <XAxis type="number" {...AXIS} axisLine={{ stroke:'#111' }} tickLine={false}/>
+                <YAxis type="category" dataKey="gene" {...AXIS} axisLine={{ stroke:'#111' }} tickLine={false} width={60} />
+                <Tooltip contentStyle={TIP} />
+                <Bar dataKey="mean_expression" fill="#CC0000"/>
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -107,20 +120,20 @@ export default function RnaExplorer() {
         <Heatmap data={hm} />
       </Card>
 
-      <Card title="RNA samples (first 100)">
+      <Card title="RNA samples · first 100">
         <div className="scrollbox">
           <table className="data">
             <thead>
-              <tr><th>Sample</th><th>Gene</th><th>Tissue</th><th>Condition</th><th>TPM</th><th>Category</th></tr>
+              <tr><th>Sample</th><th>Gene</th><th>Tissue</th><th>Condition</th><th className="text-right">TPM</th><th>Category</th></tr>
             </thead>
             <tbody>
               {rows.map((r, i) => (
                 <tr key={i}>
                   <td className="font-mono text-xs">{r.rna_sample_id}</td>
-                  <td className="font-medium">{r.gene}</td>
+                  <td className="font-sans font-semibold">{r.gene}</td>
                   <td>{r.tissue}</td>
-                  <td className={r.condition === 'diseased' ? 'text-warn' : 'text-good'}>{r.condition}</td>
-                  <td className="tabular-nums text-accent">{r.tpm?.toFixed(2)}</td>
+                  <td className={r.condition === 'diseased' ? 'text-accent' : 'text-ink'}>{r.condition}</td>
+                  <td className="num text-right">{r.tpm?.toFixed(2)}</td>
                   <td><span className="badge">{r.category}</span></td>
                 </tr>
               ))}

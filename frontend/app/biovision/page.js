@@ -11,8 +11,8 @@ import {
   BarChart, Bar,
 } from 'recharts';
 
-const AXIS = { fontSize: 11, stroke: '#5b7594' };
-const TIP  = { background: 'white', border: '1px solid #b8dfe6', borderRadius: 12, fontSize: 12, color: '#0a2540' };
+const AXIS = { fontSize: 10, stroke: '#525252' };
+const TIP  = { background: '#FFFFFF', border: '1px solid #111111', borderRadius: 0, fontSize: 11, color: '#111111', fontFamily: 'JetBrains Mono, monospace' };
 
 export default function BioVisionPage() {
   const [report, setReport]  = useState(null);
@@ -48,9 +48,9 @@ export default function BioVisionPage() {
   return (
     <div>
       <PageHeader
-        eyebrow="Computer Vision"
-        title="BioVision — the AI reads the scan"
-        description="A convolutional neural network trained on real MedMNIST breast-ultrasound patches. Below: 12 real test scans with the model's live prediction, a big Grad-CAM view of what the network is looking at, and its confusion matrix."
+        eyebrow="COMPUTER VISION"
+        title={<>The AI reads <span className="italic font-normal">the scan.</span></>}
+        description="A convolutional neural network trained on real MedMNIST breast-ultrasound patches. Below: 12 real test scans with the model's live prediction, a Grad-CAM view of what the network is looking at, and its confusion matrix."
       />
 
       {/* --- HERO STATS --------------------------------------------- */}
@@ -84,14 +84,14 @@ export default function BioVisionPage() {
                 <XAxis dataKey="epoch" {...AXIS}/>
                 <YAxis {...AXIS} domain={[0, 1]}/>
                 <Tooltip contentStyle={TIP}/>
-                <Line dataKey="train_loss"   stroke="#e56b8f" strokeWidth={2.4} dot={false}/>
-                <Line dataKey="val_accuracy" stroke="#0ea5b7" strokeWidth={2.4} dot={false}/>
+                <Line dataKey="train_loss"   stroke="#CC0000" strokeWidth={2} dot={false}/>
+                <Line dataKey="val_accuracy" stroke="#111111" strokeWidth={2} dot={false}/>
               </LineChart>
             </ResponsiveContainer>
           </div>
-          <div className="flex gap-4 text-[11px] text-muted">
-            <span><span className="inline-block w-2.5 h-2.5 rounded-full bg-rose mr-1"/>train loss</span>
-            <span><span className="inline-block w-2.5 h-2.5 rounded-full bg-teal mr-1"/>val accuracy</span>
+          <div className="flex gap-4 meta !text-[10px] mt-1">
+            <span className="flex items-center gap-1"><span className="w-2 h-2 bg-accent"/>train loss</span>
+            <span className="flex items-center gap-1"><span className="w-2 h-2 bg-ink"/>val accuracy</span>
           </div>
         </Card>
 
@@ -106,8 +106,8 @@ export default function BioVisionPage() {
 
       {/* --- BIG GRAD-CAM ------------------------------------------- */}
       <Card title="What is the model looking at?" subtitle="Original ultrasound (left) · Grad-CAM attention heatmap (right)" className="mb-5">
-        <div className="flex gap-2 mb-4">
-          <select className="bg-white border border-border rounded px-3 py-2 text-sm"
+        <div className="flex gap-2 mb-4 flex-wrap">
+          <select className="px-3 py-2 text-sm"
                   value={exemplar} onChange={(e)=>setExemplar(e.target.value)}>
             <option value="abnormal">Real abnormal ultrasound</option>
             <option value="healthy">Real normal ultrasound</option>
@@ -119,43 +119,43 @@ export default function BioVisionPage() {
         {pred && (
           <div className="grid md:grid-cols-3 gap-6 items-center">
             <div>
-              <div className="text-xs text-muted mb-2 uppercase tracking-widest">Original scan</div>
+              <div className="eyebrow text-meta !text-[10px] mb-2">Original scan</div>
               <img src={pred.original_image} alt="original"
-                   className="w-full rounded-2xl border-2 border-white shadow-cardhi"
+                   className="w-full border border-ink"
                    style={{ imageRendering: 'pixelated' }}/>
             </div>
             <div>
-              <div className="text-xs text-muted mb-2 uppercase tracking-widest">Grad-CAM heatmap</div>
+              <div className="eyebrow text-meta !text-[10px] mb-2">Grad-CAM heatmap</div>
               <img src={pred.gradcam} alt="gradcam"
-                   className="w-full rounded-2xl border-2 border-white shadow-cardhi"
+                   className="w-full border border-ink"
                    style={{ imageRendering: 'pixelated' }}/>
-              <div className="text-[10px] text-muted mt-2">
+              <div className="meta mt-2 !text-[9px]">
                 Red = strongly influenced the decision. Blue = ignored.
               </div>
             </div>
             <div>
-              <div className="text-xs text-muted uppercase tracking-widest mb-3">Model verdict</div>
+              <div className="eyebrow text-meta !text-[10px] mb-3">Model verdict</div>
               <div className="flex items-center gap-4">
                 <Gauge value={pred.confidence}
                        tone={pred.prediction === 'abnormal' ? 'rose' : 'teal'}
                        label="Confidence"/>
                 <div>
                   <div className="text-3xl font-display font-bold"
-                       style={{ color: pred.prediction === 'abnormal' ? '#e56b8f' : '#0ea5b7' }}>
+                       style={{ color: pred.prediction === 'abnormal' ? '#CC0000' : '#111111' }}>
                     {pred.prediction === 'abnormal' ? 'Abnormal' : 'Normal'}
                   </div>
-                  <div className="text-xs text-muted mt-1">{pred.source}</div>
+                  <div className="meta mt-1">{pred.source}</div>
                 </div>
               </div>
               <div className="mt-5">
-                <div className="text-xs text-muted mb-2 uppercase tracking-widest">Class probabilities</div>
+                <div className="eyebrow text-meta !text-[10px] mb-2">Class probabilities</div>
                 <div className="h-24">
                   <ResponsiveContainer>
                     <BarChart data={probs} layout="vertical" margin={{ left: 60 }}>
                       <XAxis type="number" domain={[0, 1]} {...AXIS} hide/>
                       <YAxis type="category" dataKey="class" {...AXIS} width={80} tickLine={false} axisLine={false}/>
                       <Tooltip contentStyle={TIP} formatter={(v)=>Number(v).toFixed(3)}/>
-                      <Bar dataKey="prob" fill="#0ea5b7" radius={[0,10,10,0]}/>
+                      <Bar dataKey="prob" fill="#111111"/>
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
@@ -176,7 +176,7 @@ export default function BioVisionPage() {
       <Card title="Experimental — encode a DNA sequence as a 2-D image and run the CNN"
             subtitle="A → blue · C → red · G → green · T → amber · reshaped into a 32×32 matrix and fed to the CNN. This is a computational visualization of sequence data, not a physical image of DNA.">
         <div className="flex gap-2 mb-4">
-          <input className="bg-white border border-border rounded px-3 py-2 text-sm flex-1 max-w-xs"
+          <input className="px-3 py-2 text-sm flex-1 max-w-xs"
                  value={gene} onChange={(e)=>setGene(e.target.value)} placeholder="Gene name"/>
           <button className="btn" disabled={busy} onClick={runDna}>
             {busy ? 'Running…' : 'Encode + Predict'}
@@ -185,18 +185,18 @@ export default function BioVisionPage() {
         {dna && (
           <div className="grid md:grid-cols-3 gap-6">
             <div>
-              <div className="text-xs text-muted mb-2 uppercase tracking-widest">DNA-encoded image</div>
-              <img src={dna.dna_image} alt="dna" className="w-full max-w-[240px] rounded-2xl border-2 border-white shadow-cardhi"
+              <div className="eyebrow text-meta !text-[10px] mb-2">DNA-encoded image</div>
+              <img src={dna.dna_image} alt="dna" className="w-full max-w-[240px] border border-ink"
                    style={{ imageRendering: 'pixelated' }}/>
             </div>
             <div>
-              <div className="text-xs text-muted mb-2 uppercase tracking-widest">Grad-CAM</div>
-              <img src={dna.gradcam} alt="gradcam" className="w-full max-w-[240px] rounded-2xl border-2 border-white shadow-cardhi"
+              <div className="eyebrow text-meta !text-[10px] mb-2">Grad-CAM</div>
+              <img src={dna.gradcam} alt="gradcam" className="w-full max-w-[240px] border border-ink"
                    style={{ imageRendering: 'pixelated' }}/>
             </div>
             <div>
               <Gauge value={dna.confidence} tone="teal" label="Confidence" hint={dna.prediction}/>
-              <div className="text-[10px] text-muted mt-3">{dna.disclaimer}</div>
+              <div className="meta mt-3">{dna.disclaimer}</div>
             </div>
           </div>
         )}

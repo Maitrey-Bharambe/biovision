@@ -3,12 +3,16 @@ export function Card({ title, subtitle, className = '', children, actions, varia
   return (
     <div className={`${base} ${className}`}>
       {(title || actions) && (
-        <div className="flex items-start justify-between gap-4 mb-4">
-          <div>
+        <div className="flex items-start justify-between gap-4 mb-3">
+          <div className="flex-1 min-w-0">
             {title && <div className="card-heading">{title}</div>}
-            {subtitle && <div className="text-sm text-ink2/80 mt-1.5 leading-snug">{subtitle}</div>}
+            {subtitle && (
+              <div className="text-sm text-prose font-prose mt-1 leading-snug">
+                {subtitle}
+              </div>
+            )}
           </div>
-          {actions}
+          {actions && <div className="shrink-0">{actions}</div>}
         </div>
       )}
       {children}
@@ -19,19 +23,19 @@ export function Card({ title, subtitle, className = '', children, actions, varia
 export function Stat({ label, value, hint, tone = 'default', icon }) {
   const toneClass = {
     default: 'text-ink',
-    good:    'text-teal',
-    warn:    'text-gold',
-    bad:     'text-rose',
-    accent:  'text-teal',
+    good:    'text-[#2E7D32]',
+    warn:    'text-[#AD6A1A]',
+    bad:     'text-accent',
+    accent:  'text-accent',
   }[tone] || 'text-ink';
   return (
-    <div className="card !py-5">
+    <div className="card !py-4">
       <div className="flex items-center justify-between">
-        <div className="card-heading">{label}</div>
-        {icon && <div className="text-teal">{icon}</div>}
+        <div className="card-heading !mb-0 !pb-2">{label}</div>
+        {icon && <div className="text-ink">{icon}</div>}
       </div>
-      <div className={`mt-3 text-3xl metric-value ${toneClass}`}>{value ?? '—'}</div>
-      {hint && <div className="text-xs text-muted mt-1">{hint}</div>}
+      <div className={`mt-2 text-3xl metric-value ${toneClass}`}>{value ?? '—'}</div>
+      {hint && <div className="text-xs text-meta mt-1 font-mono">{hint}</div>}
     </div>
   );
 }

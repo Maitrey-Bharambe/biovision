@@ -6,8 +6,8 @@ import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
 } from 'recharts';
 
-const AXIS = { fontSize: 11, stroke: '#5b7594' };
-const TIP  = { background:'white', border:'1px solid #b8dfe6', borderRadius:12, fontSize:12, color:'#0a2540' };
+const AXIS = { fontSize: 10, stroke: '#525252' };
+const TIP  = { background:'#FFFFFF', border:'1px solid #111111', borderRadius:0, fontSize:11, color:'#111111', fontFamily:'JetBrains Mono' };
 
 const DOMAINS = ['Warehouse', 'AlphaGenome', 'Computer Vision'];
 
@@ -57,7 +57,7 @@ function WarehouseDomain() {
                 <XAxis dataKey="key" {...AXIS}/>
                 <YAxis {...AXIS}/>
                 <Tooltip contentStyle={TIP}/>
-                <Bar dataKey="mutation_count" fill="#0ea5b7" radius={[10,10,0,0]}/>
+                <Bar dataKey="mutation_count" fill="#111111"/>
               </BarChart>
             </ResponsiveContainer>
           </div>

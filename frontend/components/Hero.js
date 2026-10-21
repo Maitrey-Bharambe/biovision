@@ -2,93 +2,85 @@
 import Link from 'next/link';
 
 /**
- * Overview hero — copy-forward layout.
- * The full-viewport biotech backdrop (DNA + protein + cells) is applied to
- * the <body> in globals.css, so this section stays intentionally minimal:
- * bold display headline, description, primary + secondary CTAs, and a
- * compact stat strip. No competing right-side illustration.
+ * Editorial hero — the "front page" of BioVision.
+ * Oversized Playfair headline, Lora sub-lede, two actions, and a small
+ * byline strip beneath it, in the spirit of a scientific journal cover.
  */
 export function Hero({ totals = {} }) {
+  const today = new Date().toLocaleDateString('en-US', {
+    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+  });
+
   return (
-    <section className="relative overflow-hidden rounded-4xl bg-white/50 backdrop-blur-xl border border-white/70 shadow-cardhi px-6 md:px-12 py-10 md:py-14 mb-10">
-      <div className="max-w-3xl">
-        <div className="text-teal text-xs font-semibold tracking-[0.28em] mb-4">
-          — MULTI-OMICS INTELLIGENCE PLATFORM
-        </div>
-        <h1 className="font-display font-bold text-4xl md:text-6xl text-ink leading-[1.02] tracking-tight">
-          Decode Biology<br/>
-          Discover Possibilities
-        </h1>
-        <p className="text-base md:text-lg text-ink2/80 mt-6 max-w-2xl leading-relaxed">
-          Integrating <span className="text-teal font-medium">genomics</span>,
-          {' '}<span className="text-teal font-medium">transcriptomics</span>, proteomics
-          and biological imaging with AI to unlock deeper insights into life.
-        </p>
-
-        <div className="flex flex-wrap gap-3 mt-8 items-center">
-          <Link href="/genome" className="btn !py-3.5 !px-6">
-            Explore the Genome
-            <span>→</span>
-          </Link>
-          <Link href="/demo" className="flex items-center gap-3 group">
-            <span className="w-12 h-12 rounded-full bg-white border border-border shadow-card flex items-center justify-center text-ink group-hover:shadow-cardhi transition">
-              <svg width="12" height="14" viewBox="0 0 12 14" fill="currentColor"><path d="M0 0 L12 7 L0 14 Z"/></svg>
-            </span>
-            <span>
-              <div className="text-sm font-semibold text-ink">Watch Demo</div>
-              <div className="text-xs text-muted">2 min</div>
-            </span>
-          </Link>
-        </div>
-
-        {/* mini stat strip */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-10 max-w-2xl">
-          <MiniStat icon={<IconHelix />}    value={totals.genes}       label="Genes" />
-          <MiniStat icon={<IconMutation />} value={totals.mutations}   label="Mutations" />
-          <MiniStat icon={<IconRna />}      value={totals.rna_samples} label="RNA Samples" />
-          <MiniStat icon={<IconProtein />}  value={totals.proteins}    label="Proteins" />
-        </div>
+    <section className="mb-10">
+      <div className="editorial-strip">
+        <span>BIOVISION · THE DAILY OMICS</span>
+        <span className="hidden md:inline font-mono tracking-[0.14em] text-meta">
+          {today.toUpperCase()}
+        </span>
+        <span className="hidden md:inline">VOL. 01 · ISSUE 04</span>
       </div>
+
+      <div className="grid grid-cols-12 gap-6 md:gap-10 pt-8">
+        {/* Headline block — 8 cols */}
+        <div className="col-span-12 lg:col-span-8">
+          <div className="eyebrow mb-5 text-prose">
+            — MULTI-OMICS INTELLIGENCE PLATFORM
+          </div>
+          <h1 className="font-display font-bold text-ink text-[2.75rem] sm:text-6xl md:text-7xl lg:text-[5.25rem] leading-[0.98] tracking-[-0.02em]">
+            Biology,<br/>
+            <span className="italic font-normal">seen through</span> data.
+          </h1>
+          <p className="lede mt-6 max-w-2xl">
+            A dimensional warehouse of genomics, transcriptomics, proteomics,
+            mutation evidence and biomedical imagery &mdash; wired to an
+            interactive OLAP cube, a variant laboratory and explainable models.
+            Every column is traceable to its source.
+          </p>
+
+          <div className="flex flex-wrap items-center gap-3 mt-8">
+            <Link href="/warehouse" className="btn">
+              Explore the Warehouse <span aria-hidden>→</span>
+            </Link>
+            <Link href="/olap" className="btn btn-ghost">
+              Open the OLAP Lab <span aria-hidden>↗</span>
+            </Link>
+            <Link href="/alpha" className="meta underline-offset-4 hover:underline">
+              DNA Editor →
+            </Link>
+          </div>
+        </div>
+
+        {/* Byline / meta — 4 cols */}
+        <aside className="col-span-12 lg:col-span-4 lg:border-l lg:border-ink lg:pl-6">
+          <div className="eyebrow mb-3">In this issue</div>
+          <ul className="font-prose text-[15px] text-ink space-y-2 leading-snug">
+            <li>· The star schema that reads like a periodical.</li>
+            <li>· A rotating cube for roll-up, drill, slice &amp; dice.</li>
+            <li>· An AlphaGenome-inspired DNA editing bench.</li>
+            <li>· Grad-CAM over medical imagery.</li>
+          </ul>
+          <div className="rule-h my-4" />
+          <div className="eyebrow mb-2 text-prose">Snapshot</div>
+          <dl className="grid grid-cols-2 gap-x-4 gap-y-2 font-mono text-sm">
+            <HeroStat value={totals.genes}       label="Genes" />
+            <HeroStat value={totals.mutations}   label="Mutations" />
+            <HeroStat value={totals.rna_samples} label="RNA" />
+            <HeroStat value={totals.proteins}    label="Proteins" />
+          </dl>
+        </aside>
+      </div>
+
+      <div className="rule-h-thick mt-10" />
     </section>
   );
 }
 
-function MiniStat({ icon, value, label }) {
+function HeroStat({ value, label }) {
   return (
-    <div className="flex items-center gap-3">
-      <div className="w-9 h-9 rounded-xl bg-white shadow-card flex items-center justify-center text-teal">
-        {icon}
-      </div>
-      <div>
-        <div className="text-lg font-display font-bold text-ink leading-none">{value ?? '—'}</div>
-        <div className="text-[10px] uppercase tracking-widest text-muted mt-0.5">{label}</div>
-      </div>
+    <div>
+      <div className="text-xl font-bold text-ink metric-value">{value ?? '—'}</div>
+      <div className="text-[10px] uppercase tracking-[0.18em] text-meta mt-0.5">{label}</div>
     </div>
   );
-}
-
-/* ---------------------- icons -------------------------------- */
-function IconHelix() {
-  return <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-    <path d="M6 4c4 4 8 4 12 0M6 20c4-4 8-4 12 0M6 4v16M18 4v16" strokeLinecap="round"/>
-  </svg>;
-}
-function IconMutation() {
-  return <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-    <circle cx="12" cy="12" r="8"/>
-    <path d="M12 6v6l4 2" strokeLinecap="round"/>
-  </svg>;
-}
-function IconRna() {
-  return <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-    <path d="M4 20L12 4l8 16M8 14h8" strokeLinecap="round" strokeLinejoin="round"/>
-  </svg>;
-}
-function IconProtein() {
-  return <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-    <circle cx="8"  cy="8"  r="3"/>
-    <circle cx="16" cy="10" r="3"/>
-    <circle cx="12" cy="17" r="3"/>
-    <path d="M10 10l3 3M14 12l0 3" strokeLinecap="round"/>
-  </svg>;
 }

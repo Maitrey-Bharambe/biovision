@@ -1,10 +1,11 @@
 import './globals.css';
 import { SidebarProvider } from '../components/SidebarContext';
+import { BioContextProvider } from '../components/BioContext';
 import { AppShell } from '../components/AppShell';
 
 export const metadata = {
-  title: 'BioVision — Your Intelligent Biotech Partner',
-  description: 'Multi-omics data warehouse, data mining and computer vision for genomic discovery.',
+  title: 'BioVision — The Daily Omics',
+  description: 'A multi-omics data warehouse, OLAP intelligence platform and DNA editing laboratory, printed as an editorial.',
 };
 
 export default function RootLayout({ children }) {
@@ -12,7 +13,9 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body>
         <SidebarProvider>
-          <AppShell>{children}</AppShell>
+          <BioContextProvider>
+            <AppShell>{children}</AppShell>
+          </BioContextProvider>
         </SidebarProvider>
       </body>
     </html>

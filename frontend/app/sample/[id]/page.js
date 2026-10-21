@@ -108,7 +108,7 @@ export default function SampleDetail({ params }) {
         <Card title="Anomaly score" subtitle="Isolation Forest on the feature matrix">
           {anom ? (
             <div>
-              <div className="text-3xl metric-value mt-2" style={{ color: anom.anomaly ? '#f87171' : '#34d399' }}>
+              <div className="text-3xl metric-value mt-2" style={{ color: anom.anomaly ? '#CC0000' : '#111111' }}>
                 {anom.score.toFixed(3)}
               </div>
               <div className="text-sm mt-1">{anom.anomaly ? 'Flagged as anomalous' : 'Within normal range'}</div>

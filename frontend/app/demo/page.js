@@ -42,9 +42,9 @@ export default function DemoPage() {
 
   return (
     <div>
-      <PageHeader eyebrow="Demo"
-        title="Run Biological Analysis"
-        description="A guided end-to-end run of the BioVision pipeline for a live audience." />
+      <PageHeader eyebrow="LIVE DEMO"
+        title={<>A pipeline, <span className="italic font-normal">on stage.</span></>}
+        description="A guided end-to-end run of the BioVision pipeline, one real backend call per stage." />
 
       <div className="text-center mb-8">
         <button className="btn text-lg px-6 py-3" disabled={running} onClick={run}>
@@ -56,15 +56,15 @@ export default function DemoPage() {
         {STEPS.map((s, i) => (
           <div key={i} className="card flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs
-                ${status[i]==='done' ? 'bg-good/20 text-good' :
-                  status[i]==='running' ? 'bg-accent/20 text-accent animate-pulse' :
-                  'bg-panel2 text-muted border border-border'}`}>
-                {status[i]==='done' ? '✓' : i+1}
+              <div className={`w-6 h-6 flex items-center justify-center text-xs border border-ink font-mono font-bold
+                ${status[i]==='done' ? 'bg-ink text-paper' :
+                  status[i]==='running' ? 'bg-accent text-paper animate-pulse' :
+                  'bg-white text-ink'}`}>
+                {status[i]==='done' ? '✓' : String(i+1).padStart(2,'0')}
               </div>
-              <div className="text-sm">STEP {i+1} — {s.label}</div>
+              <div className="font-sans text-[11px] font-bold uppercase tracking-[0.14em]">STEP {i+1} · {s.label}</div>
             </div>
-            <div className="text-xs text-muted">
+            <div className="meta !text-[10px] font-mono">
               {status[i]==='done' && outputs[i]?.elapsed ? `${outputs[i].elapsed} ms` : ''}
             </div>
           </div>
@@ -76,8 +76,8 @@ export default function DemoPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {outputs.map((o, i) => (
               <div key={i} className="card !p-3">
-                <div className="text-xs text-muted mb-1">{o.step}</div>
-                <div className="text-sm">{o.summary}</div>
+                <div className="eyebrow !text-[9px] text-meta mb-1">{o.step}</div>
+                <div className="text-sm font-prose">{o.summary}</div>
               </div>
             ))}
           </div>

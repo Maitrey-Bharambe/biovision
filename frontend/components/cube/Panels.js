@@ -95,9 +95,9 @@ function Row({ k, v, accent }) {
 }
 function Stat({ k, v }) {
   return (
-    <div className="rounded-lg bg-white/5 border border-white/10 p-2">
-      <div className="text-[10px] uppercase tracking-widest text-cube-muted">{k}</div>
-      <div className="tabular-nums text-cube-fg font-semibold">{v ?? '—'}</div>
+    <div className="border border-ink bg-subtle p-2">
+      <div className="text-[10px] uppercase tracking-widest text-cube-muted font-sans font-bold">{k}</div>
+      <div className="font-mono tabular-nums text-cube-fg font-semibold">{v ?? '—'}</div>
     </div>
   );
 }
@@ -150,14 +150,14 @@ export function HistoryPanel({ history, onRestore }) {
       <div className="cube-panel-heading">Query History</div>
       <ol className="space-y-1 text-xs">
         {history.map((h, i) => (
-          <li key={i}>
+          <li key={i} className="border-b border-ink last:border-b-0">
             <button onClick={() => onRestore(i)}
-                    className="w-full text-left px-2 py-1.5 rounded hover:bg-white/5 flex justify-between items-center">
-              <span className="text-cube-fg">
-                <span className="text-cube-muted mr-1">{String(i + 1).padStart(2,'0')}</span>
-                {h.label}
+                    className="w-full text-left px-2 py-1.5 hover:bg-subtle flex justify-between items-center gap-2">
+              <span className="text-cube-fg flex items-center gap-2">
+                <span className="font-mono text-cube-muted">{String(i + 1).padStart(2,'0')}</span>
+                <span className="font-sans font-bold uppercase tracking-[0.14em] text-[10px]">{h.label}</span>
               </span>
-              <span className="text-cube-muted text-[10px]">{h.detail}</span>
+              <span className="font-mono text-cube-muted text-[10px] truncate">{h.detail}</span>
             </button>
           </li>
         ))}

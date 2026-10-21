@@ -3,12 +3,8 @@ import { useSidebar } from './SidebarContext';
 import { Sidebar, SidebarOpenButton } from './Sidebar';
 import { BackButton } from './BackButton';
 import { Disclaimer } from './Disclaimer';
+import { ContextBreadcrumb } from './BioContext';
 
-/**
- * Client shell that reacts to sidebar state. When the sidebar is closed
- * we reserve a small gutter on the left of <main> so the floating open
- * button never sits on top of the content.
- */
 export function AppShell({ children }) {
   const { open } = useSidebar();
   return (
@@ -16,10 +12,11 @@ export function AppShell({ children }) {
       <Sidebar />
       <SidebarOpenButton />
       <main
-        className={`flex-1 py-8 md:py-10 max-w-[1600px] mx-auto w-full transition-[padding] duration-300
+        className={`flex-1 py-6 md:py-8 max-w-[1600px] mx-auto w-full transition-[padding] duration-200
                     ${open ? 'px-6 md:px-10' : 'pl-20 md:pl-24 pr-6 md:pr-10'}`}
       >
         <BackButton />
+        <ContextBreadcrumb />
         {children}
         <Disclaimer />
       </main>
