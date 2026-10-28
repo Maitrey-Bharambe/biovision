@@ -73,6 +73,10 @@ export const api = {
   warehouseSchema: ()                             => req('/warehouse/schema'),
   runEtl:          ()                             => req('/etl/run', { method: 'POST' }),
 
+  // Nexus — natural-language investigation
+  nexusStatus:      ()                            => req('/nexus/status'),
+  nexusInvestigate: (body)                        => req('/nexus/investigate', { method: 'POST', body: JSON.stringify(body) }),
+
   // AlphaGenome Lab
   alphaCatalog:    ()                             => req('/alpha/catalog'),
   geneReference:   (gene, length = 240)           => req(`/alpha/gene-reference?gene=${gene}&length=${length}`),

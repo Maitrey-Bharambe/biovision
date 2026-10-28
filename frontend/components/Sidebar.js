@@ -3,56 +3,56 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useSidebar } from './SidebarContext';
 
+/* ------------------------------------------------------------
+ * Icon set — a single stroke style so the sidebar reads evenly.
+ * ---------------------------------------------------------- */
 const I = {
-  home:     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M3 12l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>,
-  helix:    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M6 4c4 4 8 4 12 0M6 20c4-4 8-4 12 0M6 4v16M18 4v16"/></svg>,
-  rna:      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M4 20l8-16 8 16M8 14h8" strokeLinejoin="round"/></svg>,
-  protein:  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><circle cx="8" cy="8" r="3"/><circle cx="16" cy="10" r="3"/><circle cx="12" cy="17" r="3"/><path d="M10 10l3 3M14 12l0 3"/></svg>,
-  mutation: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><circle cx="12" cy="12" r="8"/><path d="M12 6v6l4 2"/></svg>,
-  cv:       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>,
-  brain:    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M9 3a4 4 0 00-4 4 4 4 0 00-2 3 3 3 0 003 3v3a3 3 0 003 3M15 3a4 4 0 014 4 4 4 0 012 3 3 3 0 01-3 3v3a3 3 0 01-3 3"/></svg>,
-  olap:     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><rect x="3" y="12" width="4" height="8"/><rect x="10" y="6" width="4" height="14"/><rect x="17" y="9" width="4" height="11"/></svg>,
-  db:       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.66 3.58 3 8 3s8-1.34 8-3V5M4 11v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6"/></svg>,
-  flask:    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M9 3h6M10 3v6l-5 9a2 2 0 001.8 3h10.4a2 2 0 001.8-3l-5-9V3"/></svg>,
-  play:     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6 4v16l14-8z"/></svg>,
-  chev:     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M15 6l-6 6 6 6" strokeLinecap="round"/></svg>,
+  overview: (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>),
+  nexus:    (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><circle cx="12" cy="12" r="3"/><circle cx="4" cy="4" r="1.5"/><circle cx="20" cy="4" r="1.5"/><circle cx="4" cy="20" r="1.5"/><circle cx="20" cy="20" r="1.5"/><path d="M4 4l6 6M20 4l-6 6M4 20l6-6M20 20l-6-6"/></svg>),
+  saved:    (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><path d="M6 3h12v18l-6-4-6 4V3z"/></svg>),
+  helix:    (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><path d="M6 4c4 4 8 4 12 0M6 20c4-4 8-4 12 0M6 4v16M18 4v16"/></svg>),
+  rna:      (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><path d="M4 20l8-16 8 16M8 14h8" strokeLinejoin="round"/></svg>),
+  protein:  (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><circle cx="8" cy="8" r="3"/><circle cx="16" cy="10" r="3"/><circle cx="12" cy="17" r="3"/><path d="M10 10l3 3M14 12l0 3"/></svg>),
+  mutation: (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><circle cx="12" cy="12" r="8"/><path d="M12 6v6l4 2"/></svg>),
+  cube:     (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><path d="M12 3l8 4v10l-8 4-8-4V7l8-4z"/><path d="M4 7l8 4 8-4M12 11v10" /></svg>),
+  mining:   (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><circle cx="6" cy="7" r="2"/><circle cx="18" cy="7" r="2"/><circle cx="6" cy="17" r="2"/><circle cx="18" cy="17" r="2"/><path d="M8 7h8M8 17h8M6 9v6M18 9v6"/></svg>),
+  cv:       (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>),
+  flask:    (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><path d="M9 3h6M10 3v6l-5 9a2 2 0 001.8 3h10.4a2 2 0 001.8-3l-5-9V3"/></svg>),
+  pill:     (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><rect x="3" y="9" width="18" height="6" rx="3"/><path d="M12 9v6"/></svg>),
+  source:   (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.66 3.58 3 8 3s8-1.34 8-3V5M4 11v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6"/></svg>),
+  health:   (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><path d="M3 12h4l2-6 4 12 2-6h6"/></svg>),
+  cog:      (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 00-.3-2l2-1.5-2-3.4-2.4.8a7 7 0 00-3.3-1.9L12 1.5l-3 .5A7 7 0 005.7 4L3.3 3.1l-2 3.4L3.3 8A7 7 0 003 10v2a7 7 0 00.3 2l-2 1.5 2 3.4 2.4-.8a7 7 0 003.3 1.9L12 22.5l3-.5a7 7 0 003.3-1.9l2.4.8 2-3.4-2-1.5A7 7 0 0019 14z"/></svg>),
+  chev:     (<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M15 6l-6 6 6 6" strokeLinecap="round"/></svg>),
 };
 
-const sections = [
-  {
-    label: 'DESK',
-    items: [
-      { href: '/',          label: 'Front Page',        icon: I.home },
-    ],
-  },
-  {
-    label: 'EXPLORERS',
-    items: [
-      { href: '/genome',    label: 'Genome',            icon: I.helix },
-      { href: '/rna',       label: 'Transcriptomics',   icon: I.rna },
-      { href: '/protein',   label: 'Proteomics',        icon: I.protein },
-      { href: '/mutation',  label: 'Mutations',         icon: I.mutation },
-    ],
-  },
-  {
-    label: 'LABORATORIES',
-    items: [
-      { href: '/biovision', label: 'Vision & Grad-CAM', icon: I.cv },
-      { href: '/ai-lab',    label: 'Data Mining',       icon: I.brain },
-      { href: '/alpha',     label: 'DNA Editor',        icon: I.flask },
-    ],
-  },
-  {
-    label: 'WAREHOUSE',
-    items: [
-      { href: '/olap',      label: 'OLAP Cube',         icon: I.olap },
-      { href: '/warehouse', label: 'Schema',            icon: I.db },
-      { href: '/demo',      label: 'Live Demo',         icon: I.play },
-    ],
-  },
+const GROUPS = [
+  { label: 'WORKSPACE', items: [
+    { href: '/',       label: 'Overview',             icon: I.overview },
+    { href: '/nexus',  label: 'BioVision Nexus',      icon: I.nexus, badge: 'NEW' },
+    { href: '/saved',  label: 'Saved Investigations', icon: I.saved },
+  ]},
+  { label: 'BIOLOGICAL DATA', items: [
+    { href: '/genome',   label: 'Genome Explorer', icon: I.helix },
+    { href: '/rna',      label: 'Transcriptome',   icon: I.rna },
+    { href: '/protein',  label: 'Proteomics',      icon: I.protein },
+    { href: '/mutation', label: 'Mutations',       icon: I.mutation },
+  ]},
+  { label: 'ANALYTICS', items: [
+    { href: '/olap',      label: '3D OLAP Cube',          icon: I.cube },
+    { href: '/ai-lab',    label: 'Data Mining Studio',    icon: I.mining },
+    { href: '/biovision', label: 'Vision & Explainability', icon: I.cv },
+  ]},
+  { label: 'RESEARCH TOOLS', items: [
+    { href: '/alpha', label: 'DNA Editing Bench',      icon: I.flask },
+    { href: '/alpha?tab=remedy', label: 'Precision Remedy Lookup', icon: I.pill },
+  ]},
+  { label: 'SYSTEM', items: [
+    { href: '/sources',   label: 'Data Sources',    icon: I.source },
+    { href: '/warehouse', label: 'Warehouse Health', icon: I.health },
+    { href: '/demo',      label: 'Live Demo',       icon: I.cog },
+  ]},
 ];
 
-/** Floating open button — shown when the sidebar is collapsed. */
 export function SidebarOpenButton() {
   const { open, toggle } = useSidebar();
   if (open) return null;
@@ -60,7 +60,7 @@ export function SidebarOpenButton() {
     <button
       onClick={toggle}
       aria-label="Open menu"
-      className="fixed top-6 left-4 md:left-5 z-50 w-10 h-10 border border-ink bg-white flex items-center justify-center text-ink hover:bg-ink hover:text-white transition"
+      className="fixed top-5 left-4 md:left-5 z-50 w-10 h-10 rounded-2xl bg-sidebar text-white border border-black shadow-cardhi flex items-center justify-center hover:bg-black transition"
     >
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
         <path d="M4 6h16M4 12h16M4 18h16" strokeLinecap="round"/>
@@ -75,68 +75,68 @@ export function Sidebar() {
 
   return (
     <aside
-      className={`shrink-0 hidden md:block sticky top-0 h-screen bg-paper
-                  ${open ? 'border-r-2 border-ink' : 'border-r-0'}
+      className={`shrink-0 hidden md:block sticky top-4 bottom-4 h-[calc(100vh-2rem)] ml-4
+                  bg-sidebar text-white rounded-[28px] shadow-cardhi
                   transition-[width] duration-200 ease-out overflow-hidden
-                  ${open ? 'w-64' : 'w-0'}`}
+                  ${open ? 'w-56' : 'w-0'}`}
       style={{ minWidth: 0 }}
     >
-     <div className="w-64 h-screen flex flex-col px-5 py-6">
+      <div className="w-56 h-full flex flex-col px-3 py-5">
+        {/* Masthead — matches the "intelly" wordmark style */}
+        <div className="flex items-center justify-between mb-6 px-2">
+          <Link href="/" className="flex items-center gap-2">
+            <span className="font-display font-semibold text-[22px] text-white tracking-tight leading-none">
+              biovision<span className="text-accent">.</span>
+            </span>
+          </Link>
+          <button onClick={toggle} aria-label="Close menu"
+                  className="w-6 h-6 rounded-md text-white/40 hover:text-white hover:bg-white/10 flex items-center justify-center">
+            {I.chev}
+          </button>
+        </div>
 
-      {/* Masthead */}
-      <div className="flex items-start justify-between mb-6">
-        <Link href="/" className="flex items-start gap-3">
-          <div className="w-10 h-10 bg-ink text-paper flex items-center justify-center border border-ink">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M6 4c4 4 8 4 12 0M6 20c4-4 8-4 12 0M6 4v16M18 4v16" strokeLinecap="round"/>
-            </svg>
-          </div>
-          <div className="pt-0.5">
-            <div className="font-display font-bold text-xl text-ink leading-none tracking-tight whitespace-nowrap">
-              BioVision
+        {/* Nav */}
+        <nav className="flex-1 overflow-y-auto -mx-1 px-1">
+          {GROUPS.map((g, gi) => (
+            <div key={g.label} className={gi === 0 ? '' : 'mt-5'}>
+              <div className="text-[10.5px] text-white/40 px-3 mb-1.5 capitalize">
+                {g.label.toLowerCase()}
+              </div>
+              <div className="space-y-[2px]">
+                {g.items.map((it) => {
+                  const base = it.href.split('?')[0];
+                  const active = pathname === base ||
+                                 (base !== '/' && pathname?.startsWith(base));
+                  return (
+                    <Link key={it.href} href={it.href}
+                      className={`relative flex items-center gap-2.5 px-3 py-2 text-[13px] rounded-xl transition
+                        ${active
+                          ? 'bg-white text-ink font-medium'
+                          : 'text-white/70 hover:bg-white/[0.08] hover:text-white'}`}>
+                      {active && (
+                        <span className="absolute -left-3 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-full bg-accent" aria-hidden/>
+                      )}
+                      <span className={active ? 'text-ink' : 'text-white/55'}>{it.icon}</span>
+                      <span className="flex-1 truncate">{it.label}</span>
+                      {it.badge && (
+                        <span className="text-[9px] font-bold tracking-widest text-accent bg-accent/15 px-1.5 py-0.5 rounded-full">
+                          {it.badge}
+                        </span>
+                      )}
+                    </Link>
+                  );
+                })}
+              </div>
             </div>
-            <div className="meta mt-1">The Daily Omics</div>
-          </div>
-        </Link>
-        <button onClick={toggle} aria-label="Close menu"
-                className="w-7 h-7 text-ink hover:bg-ink hover:text-paper flex items-center justify-center border border-ink">
-          {I.chev}
-        </button>
+          ))}
+        </nav>
+
+        {/* Footer */}
+        <div className="pt-4 mt-3 border-t border-white/10 px-2">
+          <div className="text-[10.5px] text-white/50">BioVision · v1.1</div>
+          <div className="text-[10px] text-white/35 mt-0.5 font-mono">Research prototype</div>
+        </div>
       </div>
-
-      <div className="rule-h-thick mb-4" />
-
-      <nav className="flex-1 overflow-y-auto -mx-1 px-1">
-        {sections.map((sec) => (
-          <div key={sec.label} className="mb-5">
-            <div className="eyebrow mb-2 text-meta !text-[10px]">{sec.label}</div>
-            <div className="space-y-0.5">
-              {sec.items.map((it) => {
-                const active = pathname === it.href
-                            || (it.href !== '/' && pathname?.startsWith(it.href));
-                return (
-                  <Link key={it.href} href={it.href}
-                    className={`flex items-center gap-3 px-2.5 py-2 text-sm transition whitespace-nowrap border border-transparent ${
-                      active
-                        ? 'bg-ink text-paper'
-                        : 'text-ink hover:bg-muted'
-                    }`}>
-                    <span className="shrink-0">{it.icon}</span>
-                    <span className="font-sans font-medium">{it.label}</span>
-                    {active && <span className="ml-auto text-accent text-xs">●</span>}
-                  </Link>
-                );
-              })}
-            </div>
-          </div>
-        ))}
-      </nav>
-
-      <div className="rule-h pt-3 meta">
-        <div className="text-[9px] tracking-[0.18em]">EST. 2025</div>
-        <div className="text-[9px] tracking-[0.18em] text-prose mt-1">v1.0.0 · PRINT ED.</div>
-      </div>
-     </div>
     </aside>
   );
 }

@@ -34,22 +34,21 @@ export default function AlphaGenomeLab() {
   return (
     <div>
       <PageHeader
-        eyebrow="DNA EDITING LAB"
-        title={<>From variant to <span className="italic font-normal">remedy</span>.</>}
-        description="Inspired by AlphaGenome (DeepMind, 2025). Edit a real gene's DNA, inspect the computed consequence, score pathogenicity against curated hotspots, and surface matching targeted therapies. Every input is a picker; every result is traced back to its source."
+        eyebrow="DNA editing bench"
+        title="From variant to remedy"
+        description="Edit a real gene's DNA, inspect the computed consequence, score pathogenicity against curated hotspots, and surface matching targeted therapies."
+        right={
+          <div className="seg-tabs" role="tablist">
+            {TABS.map(t => (
+              <button key={t.id} role="tab" aria-selected={tab === t.id}
+                      onClick={() => setTab(t.id)}
+                      className={`seg-tab ${tab === t.id ? 'active' : ''}`}>
+                {t.label}
+              </button>
+            ))}
+          </div>
+        }
       />
-
-      <div className="flex border-y-2 border-ink mb-6 overflow-x-auto">
-        {TABS.map(t => (
-          <button key={t.id}
-                  onClick={() => setTab(t.id)}
-                  className={`flex items-center gap-3 px-5 py-3 text-left border-r border-ink last:border-r-0 transition
-                    ${tab === t.id ? 'bg-ink text-paper' : 'bg-paper text-ink hover:bg-subtle'}`}>
-            <span className="font-mono text-xs opacity-60">§ {t.num}</span>
-            <span className="font-sans text-[12px] font-bold tracking-[0.18em] uppercase">{t.label}</span>
-          </button>
-        ))}
-      </div>
 
       {tab === 'editor'  && <DnaEditor />}
       {tab === 'variant' && <VariantPredictor />}
@@ -115,25 +114,17 @@ function DnaEditor() {
 
   return (
     <>
-      {/* ────────── EDIT PIPELINE DIAGRAM ────────── */}
-      <div className="editorial-strip mb-5">
-        <span className="text-prose !text-[10px]">EDIT PIPELINE</span>
-        <span className="font-mono text-[10px] tracking-[0.12em] text-meta hidden md:inline">
-          DNA VARIANT → GENOMIC ANNOTATION → VARIANT CONSEQUENCE → WAREHOUSE OBSERVATIONS → RESEARCH INTERPRETATION
-        </span>
-      </div>
-
       <div className="grid grid-cols-12 gap-5 mb-5">
-        <Card className="col-span-12 lg:col-span-4" title="1 · Gene picker">
+        {/* ===== Left: compact form ===== */}
+        <Card className="col-span-12 lg:col-span-4" title="Edit controls"
+              subtitle="Pick a gene, choose a hotspot or free position, then apply.">
           <div className="space-y-3">
-            <div>
-              <div className="eyebrow mb-1 text-meta !text-[10px]">Gene</div>
+            <Field label="Gene">
               <select value={gene} onChange={e => setGene(e.target.value)}>
                 {(catalog?.genes || []).map(g => <option key={g}>{g}</option>)}
               </select>
-            </div>
-            <div>
-              <div className="eyebrow mb-1 text-meta !text-[10px]">Jump to a known hotspot</div>
+            </Field>
+            <Field label="Known hotspot">
               <select onChange={e => jumpToHotspot(Number(e.target.value))} defaultValue={-1}>
                 <option value={-1}>— pick a real hotspot —</option>
                 {hotspots.map((h, i) => (
@@ -142,46 +133,51 @@ function DnaEditor() {
                   </option>
                 ))}
               </select>
-            </div>
+            </Field>
             <div className="grid grid-cols-2 gap-3">
-              <div>
-                <div className="eyebrow mb-1 text-meta !text-[10px]">Position</div>
+              <Field label="Position">
                 <select value={pos} onChange={e => setPos(Number(e.target.value))}>
                   {Array.from({ length: 80 }, (_, i) => i * 3).map(p =>
                     <option key={p} value={p}>{p}</option>
                   )}
                 </select>
-              </div>
-              <div>
-                <div className="eyebrow mb-1 text-meta !text-[10px]">Alt base</div>
+              </Field>
+              <Field label="Alt base">
                 <select value={alt} onChange={e => setAlt(e.target.value)} className="font-mono">
                   {BASES.map(b => <option key={b}>{b}</option>)}
                 </select>
-              </div>
+              </Field>
             </div>
-            <button className="btn w-full justify-center" onClick={runEdit} disabled={busy}>
-              {busy ? 'Applying edit…' : 'Apply edit →'}
+            <button className="btn w-full justify-center !py-2.5" onClick={runEdit} disabled={busy}>
+              {busy ? 'Applying edit…' : 'Apply edit'}
             </button>
             {report && (
               <button
-                className="btn btn-ghost w-full justify-center"
+                className="btn btn-ghost w-full justify-center !py-2"
                 onClick={() => { setReport(null); setDownstreamMuts(null); setDownstreamRna(null); }}>
                 Reset edit
               </button>
             )}
           </div>
+          <div className="mt-4 pt-3 border-t border-border text-[11.5px] text-muted">
+            Pipeline:&nbsp;
+            <span className="text-ink">variant</span>
+            {' → '}annotation
+            {' → '}<span className="text-ink">consequence</span>
+            {' → '}warehouse
+          </div>
         </Card>
 
-        <Card className="col-span-12 lg:col-span-8"
-              title="Live 3-D double helix"
-              subtitle="Drag to orbit · scroll to zoom · click any bead to select that position. The ring marks your edit site; the alt base floats next to it."
-              actions={<span className="pill">Three.js · live</span>}>
+        {/* ===== Right: big helix ===== */}
+        <Card className="col-span-12 lg:col-span-8" title="Live 3-D double helix"
+              subtitle="Drag to orbit, scroll to zoom, click any bead to select that position."
+              actions={<span className="pill pill-accent !py-0.5 !px-2 !text-[10px]">THREE.JS · LIVE</span>}>
           <Dna3DHelix
             sequence={ref?.reference_dna || 'ATGCGTAGCTAGCTAGCGTA'}
             highlight={pos}
             altBase={alt}
             onPick={(p) => setPos(p)}
-            height={420}
+            height={520}
             showProtein
           />
         </Card>
@@ -344,16 +340,15 @@ function VariantPredictor() {
   return (
     <>
       <div className="grid grid-cols-12 gap-5 mb-5">
-        <Card className="col-span-12 lg:col-span-4" title="Input variant">
+        <Card className="col-span-12 lg:col-span-4" title="Input variant"
+              subtitle="Score any single-nucleotide substitution against curated hotspots.">
           <div className="space-y-3">
-            <div>
-              <div className="eyebrow mb-1 text-meta !text-[10px]">Gene</div>
+            <Field label="Gene">
               <select value={gene} onChange={e=>setGene(e.target.value)}>
                 {(catalog?.genes || []).map(g => <option key={g}>{g}</option>)}
               </select>
-            </div>
-            <div>
-              <div className="eyebrow mb-1 text-meta !text-[10px]">Or pick a known hotspot</div>
+            </Field>
+            <Field label="Known hotspot">
               <select onChange={e => jumpToHotspot(Number(e.target.value))} defaultValue={-1}>
                 <option value={-1}>— pick a real hotspot —</option>
                 {hotspots.map((h, i) => (
@@ -362,24 +357,22 @@ function VariantPredictor() {
                   </option>
                 ))}
               </select>
-            </div>
+            </Field>
             <div className="grid grid-cols-2 gap-3">
-              <div>
-                <div className="eyebrow mb-1 text-meta !text-[10px]">Position</div>
+              <Field label="Position">
                 <select value={pos} onChange={e=>setPos(Number(e.target.value))}>
                   {Array.from({ length: 80 }, (_, i) => i * 3).map(p =>
                     <option key={p} value={p}>{p}</option>
                   )}
                 </select>
-              </div>
-              <div>
-                <div className="eyebrow mb-1 text-meta !text-[10px]">Alt base</div>
+              </Field>
+              <Field label="Alt base">
                 <select value={alt} onChange={e=>setAlt(e.target.value)} className="font-mono">
                   {BASES.map(b => <option key={b}>{b}</option>)}
                 </select>
-              </div>
+              </Field>
             </div>
-            <button className="btn w-full justify-center" onClick={run} disabled={busy}>
+            <button className="btn w-full justify-center !py-2.5" onClick={run} disabled={busy}>
               {busy ? 'Scoring…' : 'Predict effect'}
             </button>
           </div>
@@ -567,6 +560,15 @@ function RemedyRecommender() {
 /* ================================================================ */
 /*  Small pieces                                                     */
 /* ================================================================ */
+function Field({ label, children }) {
+  return (
+    <label className="block">
+      <div className="text-[11.5px] font-medium text-muted mb-1">{label}</div>
+      {children}
+    </label>
+  );
+}
+
 function ConnectedViewsBanner({ edit, matchedMut, rnaCount }) {
   const lines = [];
   if (matchedMut) {

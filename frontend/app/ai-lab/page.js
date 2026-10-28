@@ -34,22 +34,20 @@ export default function AiLab() {
   return (
     <div>
       <PageHeader
-        eyebrow="DATA MINING"
-        title={<>Clusters, rules, <span className="italic font-normal">outliers.</span></>}
-        description="Four data-mining modules trained on the real warehouse. Each tab shows model metrics, its errors, and the samples it flagged."
+        eyebrow="Data mining"
+        description="Four data-mining modules trained on the warehouse. Each tab shows the model's metrics, errors and flagged samples."
+        right={
+          <div className="seg-tabs" role="tablist">
+            {TABS.map(t => (
+              <button key={t} role="tab" aria-selected={tab === t}
+                      onClick={() => setTab(t)}
+                      className={`seg-tab ${tab === t ? 'active' : ''}`}>
+                {t}
+              </button>
+            ))}
+          </div>
+        }
       />
-
-      <div className="flex border-y-2 border-ink mb-6 overflow-x-auto">
-        {TABS.map((t, i) => (
-          <button key={t}
-                  onClick={() => setTab(t)}
-                  className={`flex items-center gap-3 px-5 py-3 border-r border-ink last:border-r-0 text-left transition
-                    ${tab === t ? 'bg-ink text-paper' : 'bg-paper text-ink hover:bg-subtle'}`}>
-            <span className="font-mono text-xs opacity-60">§ 0{i+1}</span>
-            <span className="font-sans text-[12px] font-bold tracking-[0.18em] uppercase">{t}</span>
-          </button>
-        ))}
-      </div>
 
       {tab === 'Classification' && <ClassificationTab data={cls} />}
       {tab === 'Clustering'     && <ClusteringTab     data={clu} />}

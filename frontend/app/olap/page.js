@@ -30,16 +30,22 @@ export default function OlapPage() {
   return (
     <div>
       <PageHeader
-        eyebrow="OLAP LABORATORY"
-        title={<>A cube that <span className="italic font-normal">answers back.</span></>}
-        description="Every fact in FACT_BIOLOGICAL_OBSERVATION mapped into a 3-D cube. Roll-up, drill-down, slice, dice and pivot — each button issues a real SQL aggregation, each transition animates the analytical view."
+        eyebrow="OLAP laboratory"
+        description="Every fact in FACT_BIOLOGICAL_OBSERVATION mapped into a 3-D cube. Roll-up, drill-down, slice, dice and pivot — each button issues a real SQL aggregation."
+        right={
+          <div className="seg-tabs" role="tablist">
+            <button role="tab" aria-selected={view==='cube'}
+                    onClick={() => setView('cube')}
+                    className={`seg-tab ${view==='cube' ? 'active' : ''}`}>3D Cube</button>
+            <button role="tab" aria-selected={view==='table'}
+                    onClick={() => setView('table')}
+                    className={`seg-tab ${view==='table' ? 'active' : ''}`}>Table</button>
+            <button role="tab" aria-selected={view==='domain'}
+                    onClick={() => setView('domain')}
+                    className={`seg-tab ${view==='domain' ? 'active' : ''}`}>Domain OLAP</button>
+          </div>
+        }
       />
-
-      <div className="flex gap-0 mb-5 flex-wrap border-y border-ink">
-        <ViewTab active={view === 'cube'}   onClick={() => setView('cube')}  label="3D Cube"/>
-        <ViewTab active={view === 'table'}  onClick={() => setView('table')} label="Table View"/>
-        <ViewTab active={view === 'domain'} onClick={() => setView('domain')} label="Domain OLAP · Warehouse / AlphaGenome / CV"/>
-      </div>
 
       {view === 'domain' ? <DomainOlap/> : <LiveCube tableOnly={view === 'table'}/>}
     </div>

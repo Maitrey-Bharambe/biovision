@@ -4,91 +4,95 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        /* === Newsprint palette ====================================== */
-        paper:    '#F9F9F7',   // page background
-        ink:      '#111111',   // primary text and borders
-        rule:     '#111111',   // alias: structural lines
-        muted:    '#737373',   // metadata / muted text (common usage: text-muted)
-        mutedbg:  '#E5E5E0',   // muted BACKGROUND panel
-        subtle:   '#F5F5F5',   // light neutral
-        meta:     '#737373',   // metadata text (alias of muted)
-        prose:    '#525252',   // secondary / body copy
-        accent:   '#CC0000',   // primary accent — used sparingly
+        /* === BioVision Intelligence palette ====================== */
+        canvas:   '#F8F5EC',   // page background (warm cream)
+        surface:  '#FFFEFA',   // card / panel
+        surface2: '#FFFFFF',   // elevated surface
+        ink:      '#171717',   // primary text
+        sidebar:  '#171717',   // sidebar background
+        muted:    '#77736C',   // secondary / muted text
+        meta:     '#A09B91',   // metadata
+        border:   '#DED9CD',   // subtle borders
+        hairline: '#EFEAE0',   // very subtle divider
 
-        /* === Categorical palette for scientific charts =========== */
-        catA: '#CC0000',
-        catB: '#1F4E79',
-        catC: '#2E7D32',
-        catD: '#AD6A1A',
-        catE: '#6B3FA0',
-        catF: '#0F766E',
-        catG: '#C2410C',
-        catH: '#525252',
+        /* Signature accent */
+        accent:   '#7656E8',
+        accent2:  '#5E3FD6',   // hover / pressed
+        accentTint:'#EFEAFC',  // soft accent background
 
-        /* === DNA nucleotide colours (kept) ======================== */
-        nucA: '#1F4E79',
-        nucC: '#CC0000',
-        nucG: '#2E7D32',
-        nucT: '#AD6A1A',
+        /* Biological category colours */
+        genomics:       '#F0B4D5',
+        genomicsInk:    '#8D3B6A',
+        transcript:     '#F4D96B',
+        transcriptInk:  '#866900',
+        proteomics:     '#A9C59A',
+        proteomicsInk:  '#4B6B3F',
+        imaging:        '#AFC8F0',
+        imagingInk:     '#3E578A',
 
-        /* === Back-compat aliases =================================
-           Existing pages reference bg/surface/surface2/text/panel/
-           panel2/border/teal/aqua/mint/deep/gold/rose/ink2/good/
-           warn/bad/accent2. Re-point them to the Newsprint ink/paper
-           tokens so no page needs an inline rewrite, while still
-           giving each role a plausible newsprint equivalent.      */
-        bg:       '#F9F9F7',
-        surface:  '#FFFFFF',
-        surface2: '#F5F5F5',
-        panel:    '#FFFFFF',
-        panel2:   '#F5F5F5',
-        text:     '#111111',
-        ink2:     '#111111',
-        border:   '#111111',
-        teal:     '#111111',
-        aqua:     '#525252',
-        mint:     '#2E7D32',
-        deep:     '#111111',
-        gold:     '#AD6A1A',
-        rose:     '#CC0000',
-        good:     '#2E7D32',
-        warn:     '#AD6A1A',
-        bad:      '#CC0000',
-        accent2:  '#525252',
+        /* Mutation / state colours (keep muted) */
+        good:     '#4B8A5E',
+        warn:     '#B88520',
+        bad:      '#C14D5A',
+
+        /* === Back-compat aliases for pages that still reference the
+           previous palette (paper/accent/subtle/etc.).  Pointing them
+           at semantically-equivalent new tokens keeps everything
+           visually coherent without touching every component. ===== */
+        paper:    '#F8F5EC',
+        bg:       '#F8F5EC',
+        panel:    '#FFFEFA',
+        panel2:   '#FFFEFA',
+        subtle:   '#F2EDE1',
+        rule:     '#DED9CD',
+        prose:    '#39352F',
+        mutedbg:  '#F2EDE1',
+        text:     '#171717',
+        ink2:     '#171717',
+        teal:     '#7656E8',
+        aqua:     '#7656E8',
+        mint:     '#4B8A5E',
+        deep:     '#171717',
+        gold:     '#B88520',
+        rose:     '#C14D5A',
+        /* Nucleotide (unchanged — biological categorical) */
+        nucA:     '#3E578A',
+        nucC:     '#C14D5A',
+        nucG:     '#4B8A5E',
+        nucT:     '#B88520',
       },
       fontFamily: {
-        display: ['"Playfair Display"','ui-serif','Georgia','serif'],
-        serif:   ['"Playfair Display"','ui-serif','Georgia','serif'],
-        prose:   ['"Lora"','ui-serif','Georgia','serif'],
-        sans:    ['"Inter"','system-ui','sans-serif'],
-        mono:    ['"JetBrains Mono"','ui-monospace','SFMono-Regular','Menlo','monospace'],
+        /* Inter = UI. Fraunces = editorial display. JetBrains Mono = numeric. */
+        display: ['"Fraunces"', 'ui-serif', 'Georgia', 'serif'],
+        serif:   ['"Fraunces"', 'ui-serif', 'Georgia', 'serif'],
+        prose:   ['"Inter"', 'system-ui', 'sans-serif'],
+        sans:    ['"Inter"', 'system-ui', 'sans-serif'],
+        mono:    ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
       },
       borderRadius: {
-        /* Newsprint is strict square geometry.                    */
-        none: '0px',
-        sm:   '0px',
-        DEFAULT: '0px',
-        md:   '0px',
-        lg:   '0px',
-        xl:   '0px',
-        '2xl':'0px',
-        '3xl':'0px',
-        '4xl':'0px',
-        '5xl':'0px',
-        full: '9999px',  // kept only for dots / indicators
+        none:    '0px',
+        sm:      '6px',
+        DEFAULT: '10px',
+        md:      '10px',
+        lg:      '14px',
+        xl:      '18px',
+        '2xl':   '22px',
+        '3xl':   '28px',
+        '4xl':   '32px',
+        '5xl':   '40px',
+        full:    '9999px',
       },
       boxShadow: {
-        /* Hard-offset editorial shadow — no soft blur.            */
-        card:    '0 0 0 1px #111111',
-        cardhi:  '4px 4px 0 0 #111111',
-        inset:   'none',
+        card:    '0 1px 2px rgba(23,23,23,0.04), 0 1px 1px rgba(23,23,23,0.04)',
+        cardhi:  '0 8px 24px -12px rgba(23,23,23,0.14), 0 2px 6px rgba(23,23,23,0.05)',
+        focus:   '0 0 0 3px rgba(118,86,232,0.22)',
+        inset:   'inset 0 1px 0 rgba(255,255,255,0.6)',
       },
       backgroundImage: {
-        /* Replaces the old aqua radial.                           */
-        'newsprint-dot': 'radial-gradient(#1111111a 1px, transparent 1px)',
+        'grain': 'radial-gradient(rgba(23,23,23,0.04) 1px, transparent 1px)',
       },
       letterSpacing: {
-        'eyebrow': '0.22em',
+        'eyebrow': '0.16em',
       },
     },
   },

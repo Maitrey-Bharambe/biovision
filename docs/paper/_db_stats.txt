@@ -1,0 +1,61 @@
+=== TABLES ===
+dim_chromosome                            24
+dim_disease                               7
+dim_gene                                  20
+dim_genome                                1
+dim_image                                 120
+dim_mutation                              33
+dim_organism                              1
+dim_protein                               20
+dim_rna                                   280
+dim_sample                                569
+dim_time                                  96
+fact_biological_observation               8535
+
+=== COLUMNS PER TABLE ===
+dim_chromosome                            5 cols: chromosome_key, genome_key, chromosome_number, length_bp, gc_content
+dim_disease                               4 cols: disease_key, disease_id, disease_name, disease_category
+dim_gene                                  9 cols: gene_key, gene_id, gene_name, chromosome_key, start_position, end_position, strand, biotype, description
+dim_genome                                5 cols: genome_key, genome_id, organism_key, assembly_version, build_date
+dim_image                                 8 cols: image_key, image_id, sample_key, image_type, tissue, label, source, path
+dim_mutation                              10 cols: mutation_key, mutation_id, gene_key, chromosome_key, position, ref_allele, alt_allele, mutation_type, consequence, frequency
+dim_organism                              4 cols: organism_key, scientific_name, common_name, taxonomy_id
+dim_protein                               10 cols: protein_key, protein_id, gene_key, protein_name, amino_acid_length, molecular_weight, abundance, cellular_location, ec_number, function_summary
+dim_rna                                   10 cols: rna_key, rna_sample_id, gene_key, tissue, condition_label, read_count, tpm, fpkm, expression_value, expression_category
+dim_sample                                6 cols: sample_key, sample_id, tissue, biological_condition, donor_age_bucket, donor_sex
+dim_time                                  7 cols: time_key, full_date, year, quarter, month, day, day_of_week
+fact_biological_observation               16 cols: observation_id, sample_key, gene_key, genome_key, rna_key, protein_key, mutation_key, disease_key, image_key, time_key, expression_value, protein_abundance, mutation_count, cv_score, ml_prediction, ml_confidence
+=== mutation types ===
+('DEL', 3)
+('INS', 2)
+('SNP', 26)
+('SUB', 2)
+=== mutation consequences ===
+('amplification', 1)
+('frameshift', 4)
+('fusion', 1)
+('in-frame_del', 1)
+('missense', 18)
+('nonsense', 8)
+=== rna by condition ===
+('diseased', 140)
+('healthy', 140)
+=== sample conditions ===
+('diseased', 212)
+('healthy', 357)
+=== rna tissues ===
+('Breast',)
+('Lung',)
+('Colon',)
+('Skin',)
+('Brain',)
+('Ovary',)
+('Blood',)
+=== disease categories ===
+(1, 'D001', 'Invasive Breast Carcinoma', 'Breast')
+(2, 'D002', 'Lung Adenocarcinoma', 'Lung')
+(3, 'D003', 'Colon Adenocarcinoma', 'Colorectal')
+(4, 'D004', 'Cutaneous Melanoma', 'Skin')
+(5, 'D005', 'Glioblastoma Multiforme', 'CNS')
+(6, 'D006', 'Ovarian Serous Cystadenocarcinoma', 'Ovary')
+(7, 'D007', 'Healthy Control', 'Reference')

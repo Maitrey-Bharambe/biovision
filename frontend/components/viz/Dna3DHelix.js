@@ -13,8 +13,10 @@ const NUC_COLOR = {
 const NUC_NAME = { A: 'Adenine', T: 'Thymine', C: 'Cytosine', G: 'Guanine' };
 const COMPLEMENT = { A: 'T', T: 'A', C: 'G', G: 'C' };
 
-const HELIX_RADIUS   = 1.4;
-const PITCH          = 0.42;
+/* Tuned so a 20-base window fits comfortably in a 500px canvas with
+   room for the camera to orbit without clipping. */
+const HELIX_RADIUS   = 1.55;
+const PITCH          = 0.52;
 const TURN_RATE      = 0.60;
 const BACKBONE_RGB_A = '#111111';
 const BACKBONE_RGB_B = '#525252';
@@ -32,10 +34,10 @@ export function Dna3DHelix({
   height         = 420,
   showProtein    = true,
 }) {
-  // trim sequence to a manageable window around the highlight
+  // Smaller, centred window keeps the helix visually dense inside its card.
   const [winStart, slicedSeq] = useMemo(() => {
     if (!sequence) return [0, 'ATGC'];
-    const MAX = 36;
+    const MAX = 20;
     if (sequence.length <= MAX) return [0, sequence];
     if (highlight === null)      return [0, sequence.slice(0, MAX)];
     const half = Math.floor(MAX / 2);
@@ -44,16 +46,20 @@ export function Dna3DHelix({
   }, [sequence, highlight]);
 
   const localHighlight = highlight !== null ? highlight - winStart : null;
+  // Scale camera distance to the helix height so a 20-base window
+  // always fills ~70 % of the canvas regardless of card height.
+  const helixHalfHeight = ((slicedSeq.length - 1) * PITCH) / 2;
+  const camZ = Math.max(8, helixHalfHeight * 1.6 + 2.4);
 
   return (
     <div className="w-full flex flex-col gap-2">
-      <div className="relative overflow-hidden border border-ink"
+      <div className="relative overflow-hidden rounded-[14px] border border-border"
            style={{ height,
-                    background: 'linear-gradient(180deg, #FFFFFF 0%, #F5F5F5 60%, #E5E5E0 100%)' }}>
-        <Canvas camera={{ position: [0, 0.5, 9], fov: 42 }} dpr={[1, 1.75]}>
-          <ambientLight intensity={1.1}/>
-          <pointLight position={[6, 10, 10]} intensity={0.65}/>
-          <pointLight position={[-5, -4, -5]} intensity={0.25} color="#F9F9F7"/>
+                    background: 'radial-gradient(ellipse at 50% 30%, #FFFDF8 0%, #F2EDE1 70%, #E6E0D5 100%)' }}>
+        <Canvas camera={{ position: [0, 0, camZ], fov: 36 }} dpr={[1, 1.75]}>
+          <ambientLight intensity={1.0}/>
+          <pointLight position={[6, 10, 10]} intensity={0.55}/>
+          <pointLight position={[-5, -4, -5]} intensity={0.3} color="#EFEAFC"/>
 
           <HelixAssembly
             sequence={slicedSeq}
@@ -65,14 +71,17 @@ export function Dna3DHelix({
 
           <OrbitControls
             autoRotate={autoRotate}
-            autoRotateSpeed={0.9}
+            autoRotateSpeed={0.6}
             enablePan={false}
-            minDistance={4}
-            maxDistance={16}/>
+            enableDamping={true}
+            dampingFactor={0.08}
+            minDistance={Math.max(4, camZ * 0.5)}
+            maxDistance={camZ * 2.2}
+            target={[0, 0, 0]}/>
         </Canvas>
 
         {/* Legend */}
-        <div className="absolute top-3 left-3 flex gap-3 bg-white/80 backdrop-blur rounded-full px-3 py-1 border border-border/60 shadow-card text-[11px]">
+        <div className="absolute top-3 left-3 flex gap-3 bg-white/85 backdrop-blur rounded-full px-3 py-1 border border-border shadow-card text-[11px]">
           {['A','T','C','G'].map(b => (
             <span key={b} className="inline-flex items-center gap-1 text-ink">
               <span className="w-2.5 h-2.5 rounded-full" style={{ background: NUC_COLOR[b] }}/>
@@ -82,13 +91,13 @@ export function Dna3DHelix({
         </div>
 
         {/* Position + rotation hint */}
-        <div className="absolute top-3 right-3 text-[10px] bg-white/70 backdrop-blur px-2.5 py-1 rounded-full border border-border/60 text-ink">
+        <div className="absolute top-3 right-3 text-[10px] bg-white/85 backdrop-blur px-2.5 py-1 rounded-full border border-border text-ink">
           {highlight !== null ? `pos ${highlight}` : 'drag to rotate · scroll to zoom'}
         </div>
 
         {/* Direction tag */}
-        <div className="absolute bottom-3 left-3 text-[10px] text-white/90 font-mono tracking-widest">
-          5′ ↑  strand A &nbsp;·&nbsp;  3′ ↓ strand B
+        <div className="absolute bottom-3 left-3 text-[10px] text-ink/60 font-mono tracking-widest">
+          5′ · strand A &nbsp;↕&nbsp; 3′ · strand B
         </div>
       </div>
 

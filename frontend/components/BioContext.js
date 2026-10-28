@@ -1,30 +1,27 @@
 'use client';
 /**
- * Cross-page selection context for BioVision.
+ * Investigation context — a single session-scoped selection shared
+ * across modules.  Pages opt in by calling ctx.setContext({...}) when
+ * the user picks something, and by reading ctx.gene / ctx.disease etc.
+ * when they mount.
  *
- * Preserves gene / disease / chromosome / sample / mutation across routes
- * via sessionStorage + a visible breadcrumb.  Pages opt in by reading
- * ctx.gene (etc.) and calling ctx.setContext({ gene }) when the user
- * selects something.  The breadcrumb appears in <AppShell>.
- *
- * Deliberately simple: no reducer indirection, no hidden mutations.
+ * Fields: gene · disease · chromosome · sample · mutation
  */
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
-const KEY = 'biovision.ctx';
+const KEY   = 'biovision.ctx';
 const EMPTY = { gene: null, disease: null, chromosome: null, sample: null, mutation: null };
 
 const Ctx = createContext({
   ...EMPTY,
   setContext: () => {},
-  clear:       () => {},
+  clear:      () => {},
   active:     [],
 });
 
 export function BioContextProvider({ children }) {
   const [state, setState] = useState(EMPTY);
 
-  // Hydrate from sessionStorage after first mount (SSR-safe).
   useEffect(() => {
     try {
       const raw = sessionStorage.getItem(KEY);
@@ -62,23 +59,22 @@ export function useBioContext() {
   return useContext(Ctx);
 }
 
-/** Rendered on every page below the back button. */
+/** The compact header-level context chip (optional component). */
 export function ContextBreadcrumb() {
   const { active, clear } = useBioContext();
   if (!active.length) return null;
   return (
-    <div className="flex items-center gap-3 flex-wrap mb-5 border-y border-ink py-2 bg-subtle px-3">
-      <span className="eyebrow text-meta !text-[10px]">Context</span>
+    <div className="flex items-center gap-2 flex-wrap mb-4">
+      <span className="meta !text-[10px]">context</span>
       {active.map(([k, v]) => (
-        <span key={k} className="font-mono text-[11px] tabular-nums bg-white border border-ink px-2 py-0.5">
-          <span className="text-meta uppercase">{k}</span>
-          <span className="mx-1 text-ink">/</span>
-          <span className="text-accent font-semibold">{String(v)}</span>
+        <span key={k} className="pill pill-accent !py-0.5 !px-2 !text-[10.5px]">
+          <span className="opacity-70 mr-1">{k}</span>
+          <span>{String(v)}</span>
         </span>
       ))}
       <button onClick={clear}
-              className="ml-auto meta !text-[10px] uppercase tracking-[0.18em] hover:text-ink underline-offset-4 hover:underline">
-        Clear all
+              className="meta !text-[10px] hover:text-ink underline-offset-4 hover:underline">
+        clear all
       </button>
     </div>
   );

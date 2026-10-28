@@ -1,140 +1,195 @@
 'use client';
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { api } from '../../lib/api';
 import { PageHeader } from '../../components/PageHeader';
 import { Card } from '../../components/Card';
 
-export default function WarehousePage() {
-  const [schema, setSchema] = useState(null);
-  const [etlReport, setEtlReport] = useState(null);
-  const [busy, setBusy] = useState(false);
+export default function WarehouseHealthPage() {
+  const [health, setHealth]   = useState(null);
+  const [schema, setSchema]   = useState(null);
+  const [etl, setEtl]         = useState(null);
+  const [etlBusy, setEtlBusy] = useState(false);
   const [selected, setSelected] = useState(null);
+  const [status, setStatus]   = useState('loading');
 
-  useEffect(() => { api.warehouseSchema().then(setSchema); }, []);
+  useEffect(() => {
+    (async () => {
+      const [h, s] = await Promise.all([
+        api.nexusInvestigate({
+          question: 'Check warehouse health and connectivity.',
+          explain: false,
+        }),
+        api.warehouseSchema(),
+      ]);
+      setHealth(h?.results?.[0]?.output || null);
+      setSchema(s || null);
+      setStatus('ok');
+    })();
+  }, []);
 
   const runEtl = async () => {
-    setBusy(true);
-    setEtlReport(await api.runEtl());
-    setBusy(false);
+    setEtlBusy(true);
+    setEtl(await api.runEtl());
+    setEtlBusy(false);
   };
 
   return (
     <div>
       <PageHeader
-        eyebrow="WAREHOUSE"
-        title={<>Star schema, <span className="italic font-normal">in black.</span></>}
-        description="A central fact table with 11 conformed dimensions. DIM_CHROMOSOME snowflakes off DIM_GENOME; DIM_GENE snowflakes off DIM_CHROMOSOME. Click a dimension to inspect it."
-        right={<button className="btn" disabled={busy} onClick={runEtl}>{busy ? 'Running ETL…' : 'Run ETL'}</button>}
+        eyebrow="WAREHOUSE HEALTH"
+        title="A pulse on the fact table."
+        description="Database connectivity, table availability and record counts for the current snapshot. Backed by read-only diagnostic queries."
+        right={<button className="btn" disabled={etlBusy} onClick={runEtl}>{etlBusy ? 'Running ETL…' : 'Run ETL'}</button>}
       />
 
-      {etlReport && (
+      {/* === Health ================================ */}
+      <div className="grid grid-cols-12 gap-4 mb-6">
+        <Card className="col-span-12 lg:col-span-5" title="Connectivity">
+          {health === null && <div className="meta !normal-case !tracking-normal">Checking…</div>}
+          {health && (
+            <>
+              <div className="flex items-center gap-2 mb-2 text-[14px]">
+                <span className={`w-2 h-2 rounded-full ${health.connected ? 'bg-good' : 'bg-bad'}`}/>
+                {health.connected ? 'Database reachable' : 'Database unreachable'}
+              </div>
+              {(health.errors || []).map((e, i) => (
+                <div key={i} className="text-[12px] text-bad">{e}</div>
+              ))}
+              <div className="meta mt-3 !normal-case !tracking-normal">
+                {(health.tables || []).length} table(s) discovered.
+                Row counts come from <span className="font-mono text-ink">SELECT COUNT(*)</span>, not stubs.
+              </div>
+            </>
+          )}
+        </Card>
+
+        <Card className="col-span-12 lg:col-span-7" title="Table inventory">
+          {health?.tables ? (
+            <table className="data">
+              <thead><tr><th>Table</th><th className="text-right">Rows</th><th>Error</th></tr></thead>
+              <tbody>
+                {health.tables.map((t) => (
+                  <tr key={t.name}>
+                    <td className="font-mono text-[12.5px]">{t.name}</td>
+                    <td className="num text-right">{t.rows ?? '—'}</td>
+                    <td className="text-[11.5px] text-bad">{t.error || ''}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : <div className="meta !normal-case !tracking-normal">—</div>}
+        </Card>
+      </div>
+
+      {/* === ETL report ===================================================================================== */}
+      {etl && (
         <Card title="ETL report" className="mb-6">
-          <div className="grid grid-cols-2 md:grid-cols-6 gap-0 border border-ink -mx-5 md:-mx-6 -mb-4">
-            <Stat label="Extracted"   v={etlReport.extracted} />
-            <Stat label="Cleaned"     v={etlReport.cleaned}   tone="good" />
-            <Stat label="Duplicates"  v={etlReport.duplicates_removed} tone="warn" />
-            <Stat label="Loaded"      v={etlReport.loaded}    tone="accent" />
-            <Stat label="Errors"      v={etlReport.errors}    tone="bad" />
-            <Stat label="Elapsed"     v={`${etlReport.elapsed_seconds}s`} />
+          <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
+            <StatBit label="Extracted"  v={etl.extracted}/>
+            <StatBit label="Cleaned"    v={etl.cleaned} tone="good"/>
+            <StatBit label="Duplicates" v={etl.duplicates_removed} tone="warn"/>
+            <StatBit label="Loaded"     v={etl.loaded} tone="accent"/>
+            <StatBit label="Errors"     v={etl.errors} tone="bad"/>
+            <StatBit label="Elapsed"    v={`${etl.elapsed_seconds}s`}/>
           </div>
         </Card>
       )}
 
-      <Card title="Schema map" subtitle="dimensions radiate around the fact. Click a node." className="mb-6">
-        <SchemaSvg schema={schema} selected={selected} onSelect={setSelected}/>
-      </Card>
-
+      {/* === Schema map + inspector =============== */}
       {schema && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card title="FACT" className="md:col-span-1"
-                subtitle={schema.fact.name}>
-            <ul className="text-xs space-y-1 font-mono">
-              {schema.fact.columns.map(c => (
-                <li key={c}>
-                  {c.endsWith('_key') ? <span className="text-accent font-semibold">{c}</span> : c}
-                </li>
-              ))}
-            </ul>
-          </Card>
+        <>
+          <h2 className="font-display font-semibold text-xl text-ink mb-3">Dimensional model</h2>
+          <div className="grid grid-cols-12 gap-4">
+            <Card className="col-span-12 lg:col-span-7" title="Star schema"
+                  subtitle="Click a dimension to inspect its grain.">
+              <SchemaSvg schema={schema} selected={selected} onSelect={setSelected}/>
+            </Card>
 
-          <Card title={selected ? `Inspector · ${selected}` : 'Dimensions'}
-                className="md:col-span-2"
-                subtitle={selected ? 'Click a row to compare.' : 'Click any dimension to inspect its grain.'}>
-            {selected ? (
-              <DimDetail name={selected} schema={schema} onClose={() => setSelected(null)}/>
-            ) : (
-              <table className="data">
-                <thead><tr><th>Name</th><th>Grain</th></tr></thead>
-                <tbody>
-                  {schema.dimensions.map(d => (
-                    <tr key={d.name} onClick={() => setSelected(d.name)} className="cursor-pointer">
-                      <td className="font-mono text-accent font-semibold">{d.name}</td>
-                      <td className="text-prose font-prose">{d.grain}</td>
-                    </tr>
+            <div className="col-span-12 lg:col-span-5 space-y-4">
+              <Card title={selected ? `Inspector · ${selected}` : 'Fact table'}>
+                {selected ? (
+                  <DimDetail name={selected} schema={schema} onClose={() => setSelected(null)}/>
+                ) : (
+                  <div>
+                    <div className="font-sans font-semibold text-[14px]">{schema.fact.name}</div>
+                    <ul className="text-xs mt-3 space-y-1 font-mono">
+                      {schema.fact.columns.map(c => (
+                        <li key={c}>
+                          {c.endsWith('_key')
+                            ? <span className="text-accent font-semibold">{c}</span>
+                            : <span>{c}</span>}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </Card>
+
+              <Card title="Snowflake edges">
+                <ul className="text-[13px] space-y-1">
+                  {schema.snowflake_edges.map((e, i) => (
+                    <li key={i} className="font-mono">
+                      <span>{e.from}</span>
+                      <span className="mx-2 text-accent">→</span>
+                      <span className="text-accent font-semibold">{e.to}</span>
+                    </li>
                   ))}
-                </tbody>
-              </table>
-            )}
-          </Card>
+                </ul>
+              </Card>
 
-          <Card title="Snowflake edges">
-            <ul className="text-sm space-y-1">
-              {schema.snowflake_edges.map((e, i) => (
-                <li key={i} className="font-mono">
-                  <span>{e.from}</span>
-                  <span className="mx-2 text-accent">→</span>
-                  <span className="text-accent font-semibold">{e.to}</span>
-                </li>
-              ))}
-            </ul>
-          </Card>
-
-          <Card title="Measures" className="md:col-span-2">
-            <div className="flex flex-wrap gap-2">
-              {schema.measures.map(m => <span key={m} className="badge">{m}</span>)}
+              <Card title="Measures">
+                <div className="flex flex-wrap gap-2">
+                  {schema.measures.map(m => <span key={m} className="badge">{m}</span>)}
+                </div>
+              </Card>
             </div>
-          </Card>
-        </div>
+          </div>
+        </>
       )}
     </div>
   );
 }
 
-function Stat({ label, v, tone='default' }) {
+function StatBit({ label, v, tone='default' }) {
   const c = {
     default: 'text-ink',
-    good:    'text-[#2E7D32]',
-    warn:    'text-[#AD6A1A]',
-    bad:     'text-accent',
+    good:    'text-good',
+    warn:    'text-warn',
+    bad:     'text-bad',
     accent:  'text-accent',
   }[tone];
   return (
-    <div className="p-3 border-r border-b border-ink last:border-r-0">
-      <div className="eyebrow text-meta !text-[9px]">{label}</div>
-      <div className={`text-xl metric-value mt-1 ${c}`}>{v ?? '—'}</div>
+    <div className="rounded-xl border border-border bg-surface p-3">
+      <div className="meta !text-[9.5px]">{label}</div>
+      <div className={`metric-value text-2xl mt-1 ${c}`}>{v ?? '—'}</div>
     </div>
   );
 }
 
 function DimDetail({ name, schema, onClose }) {
   const d = schema.dimensions.find(x => x.name === name);
-  if (!d) return <div className="meta">Not found.</div>;
+  if (!d) return <div className="text-muted text-[13px]">Not found.</div>;
   return (
     <div>
       <div className="flex items-start justify-between mb-3">
         <div>
-          <div className="eyebrow !text-[10px] text-meta">Grain</div>
-          <div className="font-prose text-ink">{d.grain}</div>
+          <div className="meta !text-[10px]">Grain</div>
+          <div className="text-[14px] text-ink">{d.grain}</div>
         </div>
-        <button className="meta !text-[10px] uppercase tracking-[0.18em] hover:text-ink"
-                onClick={onClose}>↩ Back</button>
+        <button onClick={onClose}
+                className="meta !text-[10px] hover:text-ink underline-offset-4 hover:underline">↩ Back</button>
       </div>
       {d.columns && (
         <div>
-          <div className="eyebrow !text-[10px] text-meta mb-2">Columns</div>
+          <div className="meta !text-[10px] mb-2">Columns</div>
           <ul className="text-xs font-mono grid grid-cols-2 gap-y-1">
             {d.columns.map(c => (
-              <li key={c}>{c.endsWith('_key') ? <span className="text-accent font-semibold">{c}</span> : c}</li>
+              <li key={c}>
+                {c.endsWith('_key')
+                  ? <span className="text-accent font-semibold">{c}</span>
+                  : <span>{c}</span>}
+              </li>
             ))}
           </ul>
         </div>
@@ -144,35 +199,37 @@ function DimDetail({ name, schema, onClose }) {
 }
 
 function SchemaSvg({ schema, selected, onSelect }) {
-  const dims = schema?.dimensions?.map(d => d.name) || [
-    'DIM_SAMPLE','DIM_GENE','DIM_GENOME','DIM_CHROMOSOME','DIM_RNA',
-    'DIM_PROTEIN','DIM_MUTATION','DIM_DISEASE','DIM_IMAGE','DIM_ORGANISM','DIM_TIME',
-  ];
-  const cx = 450, cy = 250, R = 190;
+  const dims = schema?.dimensions?.map(d => d.name) || [];
+  const cx = 450, cy = 240, R = 170;
   return (
-    <div className="w-full overflow-x-auto bg-subtle border border-ink">
-      <svg viewBox="0 0 900 500" className="w-full h-auto">
+    <div className="w-full overflow-x-auto">
+      <svg viewBox="0 0 900 480" className="w-full h-auto">
         {dims.map((d, i) => {
           const a = (i / dims.length) * 2 * Math.PI - Math.PI/2;
           const x = cx + R * Math.cos(a), y = cy + R * Math.sin(a);
           const sel = selected === d;
           return (
             <g key={d} onClick={() => onSelect(d)} style={{ cursor: 'pointer' }}>
-              <line x1={cx} y1={cy} x2={x} y2={y} stroke="#111111"/>
-              <rect x={x-45} y={y-16} width="90" height="32"
-                    fill={sel ? '#CC0000' : '#FFFFFF'} stroke="#111111" strokeWidth="1.2"/>
-              <text x={x} y={y+4} textAnchor="middle" fontSize="10"
-                    fontFamily="JetBrains Mono" fill={sel ? '#FFFFFF' : '#111111'} fontWeight="700">
+              <line x1={cx} y1={cy} x2={x} y2={y} stroke="#DED9CD" strokeWidth="1"/>
+              <rect x={x-55} y={y-18} width="110" height="36" rx="8"
+                    fill={sel ? '#7656E8' : '#FFFEFA'}
+                    stroke={sel ? '#5E3FD6' : '#DED9CD'} strokeWidth="1"/>
+              <text x={x} y={y+5} textAnchor="middle" fontSize="11"
+                    fontFamily="JetBrains Mono"
+                    fill={sel ? '#FFFEFA' : '#171717'} fontWeight="600">
                 {d.replace('DIM_','')}
               </text>
             </g>
           );
         })}
-        <rect x={cx-70} y={cy-30} width="140" height="60" fill="#111111" stroke="#111111"/>
-        <text x={cx} y={cy-8} textAnchor="middle" fontSize="12" fill="#CC0000" fontFamily="Inter" fontWeight="700" letterSpacing="2">
+        <rect x={cx-80} y={cy-30} width="160" height="60" rx="12"
+              fill="#171717" stroke="#171717"/>
+        <text x={cx} y={cy-6} textAnchor="middle" fontSize="12"
+              fill="#F0B4D5" fontFamily="Inter" fontWeight="700" letterSpacing="2">
           FACT
         </text>
-        <text x={cx} y={cy+12} textAnchor="middle" fontSize="9" fill="#F9F9F7" fontFamily="JetBrains Mono">
+        <text x={cx} y={cy+14} textAnchor="middle" fontSize="9.5"
+              fill="#F8F5EC" fontFamily="JetBrains Mono">
           BIOLOGICAL_OBSERVATION
         </text>
       </svg>

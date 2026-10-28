@@ -441,7 +441,32 @@ source .venv/bin/activate
 
 # Install Python dependencies
 pip install -r backend/requirements.txt
+
+# python-multipart is needed by FastAPI's form parsing
+pip install python-multipart
 ```
+
+#### Optional: enable the BioVision Nexus LLM
+
+The Nexus workspace works offline — a deterministic planner and
+explainer run entirely on the warehouse. To enable grounded,
+LLM-generated explanations and planning, export the Groq API key
+on the backend only (never in `NEXT_PUBLIC_*`):
+
+```bash
+# Windows PowerShell
+$env:GROQ_API_KEY = "gsk_..."
+$env:GROQ_MODEL   = "llama-3.3-70b-versatile"   # optional override
+
+# macOS / Linux
+export GROQ_API_KEY="gsk_..."
+```
+
+Without a key, `GET /nexus/status` reports the provider as
+unavailable and every investigation falls back to the deterministic
+planner + rule-based explainer. The LLM is never allowed to run SQL
+or Python; it only picks from an allowlisted set of analytical tools
+(see `backend/services/nexus.py`).
 
 ### Step 2: Execute ETL & Model Training Pipelines
 
